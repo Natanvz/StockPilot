@@ -18,15 +18,15 @@ Colors are **semantic CSS variables**, defined once on `:root` and overridden un
 maps utilities to them, so components use roles (`bg-primary`, `text-muted-foreground`), never raw
 hex. Planned token roles:
 
-| Token | Role |
-|---|---|
-| `--background` / `--foreground` | Page surface and its text |
-| `--card` / `--card-foreground` | Card/panel surface and text |
-| `--muted` / `--muted-foreground` | Subdued surfaces and secondary text |
-| `--primary` / `--primary-foreground` | Primary action (buttons, active state) |
-| `--border`, `--input`, `--ring` | Borders, input borders, focus rings |
+| Token                                     | Role                                     |
+| ----------------------------------------- | ---------------------------------------- |
+| `--background` / `--foreground`           | Page surface and its text                |
+| `--card` / `--card-foreground`            | Card/panel surface and text              |
+| `--muted` / `--muted-foreground`          | Subdued surfaces and secondary text      |
+| `--primary` / `--primary-foreground`      | Primary action (buttons, active state)   |
+| `--border`, `--input`, `--ring`           | Borders, input borders, focus rings      |
 | `--success`, `--warning`, `--destructive` | Status: active/ok, caution, delete/error |
-| `--radius` | Corner radius scale |
+| `--radius`                                | Corner radius scale                      |
 
 Re-theming = editing these values in one place.
 

@@ -22,7 +22,7 @@ document sustains ~1 write/second, and there are no cross-collection joins.
 - **Metrics via maintained aggregate counters.** Keep a `stats/products` document (total, active
   count, revenue) updated transactionally on each product write, so the dashboard reads O(1) numbers
   instead of scanning the collection. The single-document ~1 write/sec limit is handled by a
-  **sharded counter** *only if* write rate demands it — documented now, deferred until needed.
+  **sharded counter** _only if_ write rate demands it — documented now, deferred until needed.
 - **Multi-tenancy path**: prefer a `tenants/{id}/products` subcollection (strong isolation, per-tenant
   counters) over a flat `tenantId` field, unless cross-tenant reporting becomes core. Single-tenant
   today; this is the migration plan, not current code.
@@ -35,5 +35,5 @@ document sustains ~1 write/second, and there are no cross-collection joins.
 - List performance and metric cost stay flat as the collection grows to 10× and beyond; the one
   thing to watch (counter write rate) has a named, deferred fix.
 - The scalability thinking is in one place, answering both growth questions (multi-tenancy, 10×).
-- Some machinery (sharded counters, caching, real multi-tenancy) is intentionally *not* built now;
+- Some machinery (sharded counters, caching, real multi-tenancy) is intentionally _not_ built now;
   each is listed as deferred with its trigger condition, per core-belief #8.

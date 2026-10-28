@@ -7,7 +7,7 @@
 
 There are two scale questions to answer directly: how the schema evolves for **multi-tenancy** and
 for **10× the products**. We answer those plus the dimensions that matter for a growing system. The
-guiding rule (core-belief #8): design *within* the stated targets, don't build
+guiding rule (core-belief #8): design _within_ the stated targets, don't build
 machinery for scale we don't have, and write down the trade-off.
 
 ## Dimensions
@@ -26,7 +26,7 @@ Firestore scales storage and throughput automatically, but **you pay per documen
 have fixed shapes. So:
 
 - **Cursor pagination, not offsets.** The list uses `orderBy(createdAt) + startAfter(cursor) +
-  limit(n)`. Cost is proportional to the page size, not to how deep you've paged — page 1000 costs
+limit(n)`. Cost is proportional to the page size, not to how deep you've paged — page 1000 costs
   the same as page 1. Offset-style paging would read and discard every skipped document.
 - **Targeted composite indexes.** A query that filters on one field and sorts by another needs a
   composite index (declared in `firestore.indexes.json`). We add exactly the ones the list view's
@@ -72,10 +72,10 @@ bloating the parent document.
 
 Add a tenant boundary so one customer's data never mixes with another's. Two shapes:
 
-| Shape | How | Trade-off |
-|---|---|---|
-| **Field on every doc** | Add `tenantId` to each product; every query carries `where('tenantId','==',...)`. | Easiest migration from today's single-tenant model; isolation depends on never forgetting the filter (backstopped by security rules). |
-| **Subcollection per tenant** | `tenants/{tenantId}/products/{productId}`. | Strong natural isolation, simpler security rules, per-tenant counters fall out naturally; cross-tenant queries become hard (rarely needed by a tenant-scoped app). |
+| Shape                        | How                                                                               | Trade-off                                                                                                                                                          |
+| ---------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Field on every doc**       | Add `tenantId` to each product; every query carries `where('tenantId','==',...)`. | Easiest migration from today's single-tenant model; isolation depends on never forgetting the filter (backstopped by security rules).                              |
+| **Subcollection per tenant** | `tenants/{tenantId}/products/{productId}`.                                        | Strong natural isolation, simpler security rules, per-tenant counters fall out naturally; cross-tenant queries become hard (rarely needed by a tenant-scoped app). |
 
 We'd pick the **subcollection** shape for isolation, unless cross-tenant admin reporting became a
 core feature. Either way, the aggregate-counter doc becomes **per tenant** (`tenants/{id}/stats/...`),

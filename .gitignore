@@ -1,11 +1,22 @@
 # Dependencies
 node_modules/
 
-# Next.js build output
+# Next.js build output & generated files
 .next/
 out/
 build/
 dist/
+next-env.d.ts
+*.tsbuildinfo
+.vercel
+
+# Package manager extras
+.pnp
+.pnp.*
+.yarn/*
+
+# Certs
+*.pem
 
 # Environment (real secrets — never commit; .env.example IS committed)
 .env

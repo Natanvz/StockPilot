@@ -1,6 +1,6 @@
 # Architecture
 
-StockPilot is a single **Next.js 14 (App Router)** application written in **TypeScript (strict)**.
+StockPilot is a single **Next.js 16 (App Router)** application written in **TypeScript (strict)**.
 The same app serves the React UI and the Node API; there is no separate backend service. State that
 must be trusted lives behind the API; the browser never talks to Firestore directly.
 
@@ -8,18 +8,19 @@ must be trusted lives behind the API; the browser never talks to Firestore direc
 
 StockPilot optimizes for four things. This is our stance on each, with a pointer to the detail.
 
-| Attribute | Our stance | Detail |
-|---|---|---|
-| **Architecture** | One Next.js app, clear layers (UI → REST API → data access layer → Firestore); decisions recorded as ADRs. | this doc · [decisions/](decisions/) |
-| **Security** | Server-side auth on every call: Admin-SDK-verified httpOnly session cookie, custom-claim roles, OWASP basics. UI hiding is never the control. | [design/authorization.md](design/authorization.md) |
-| **Scalability** | Stateless compute (scales horizontally), cursor pagination, targeted indexes, maintained aggregate counters for metrics, a clear multi-tenancy path. | [design/scalability.md](design/scalability.md) |
-| **Code quality** | TypeScript strict, ESLint + Prettier, enforced by a pre-commit hook and CI; tests on security-critical paths. | [guides/code-quality.md](guides/code-quality.md) |
+| Attribute        | Our stance                                                                                                                                           | Detail                                             |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Architecture** | One Next.js app, clear layers (UI → REST API → data access layer → Firestore); decisions recorded as ADRs.                                           | this doc · [decisions/](decisions/)                |
+| **Security**     | Server-side auth on every call: Admin-SDK-verified httpOnly session cookie, custom-claim roles, OWASP basics. UI hiding is never the control.        | [design/authorization.md](design/authorization.md) |
+| **Scalability**  | Stateless compute (scales horizontally), cursor pagination, targeted indexes, maintained aggregate counters for metrics, a clear multi-tenancy path. | [design/scalability.md](design/scalability.md)     |
+| **Code quality** | TypeScript strict, ESLint + Prettier, enforced by a pre-commit hook and CI; tests on security-critical paths.                                        | [guides/code-quality.md](guides/code-quality.md)   |
 
 The hard, non-negotiable rules behind these live in [core-beliefs.md](core-beliefs.md).
 
 ## Stack
 
-- **Framework**: Next.js 14, App Router (`app/` directory). UI pages and the API live in one app.
+- **Framework**: Next.js 16 (React 19), App Router (`app/` directory). UI pages and the API live in
+  one app.
 - **Language**: TypeScript, `strict: true`, no implicit `any`.
 - **API**: Next.js **Route Handlers** (`app/api/**/route.ts`) — REST, not GraphQL (ADR [0003](decisions/0003-rest-over-graphql.md)).
 - **Auth**: Firebase Authentication. The client signs in and obtains an ID token; the server verifies
@@ -97,13 +98,13 @@ stockpilot/
 ## Layering & separation of concerns
 
 StockPilot is one deployable Next.js app, but it is **not** one undifferentiated blob. Concerns are
-separated by *layer*, enforced by what each layer is allowed to import:
+separated by _layer_, enforced by what each layer is allowed to import:
 
-| Layer | Lives in | Responsibility | Must not |
-|---|---|---|---|
-| **Frontend (UI)** | `app/**/page.tsx`, `components/`, `hooks/` | Render UI; call the REST API over HTTP. | Import Firestore or the Admin SDK directly. |
-| **Backend — HTTP** | `app/api/**/route.ts` | Thin controllers: authenticate, check role, Zod-validate, call a service. | Hold business/data logic inline. |
-| **Backend — core** | `lib/` | Data access (`ProductRepository`), auth, validation — framework-agnostic pure TypeScript. | Import React or anything HTTP-specific. |
+| Layer              | Lives in                                   | Responsibility                                                                            | Must not                                    |
+| ------------------ | ------------------------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **Frontend (UI)**  | `app/**/page.tsx`, `components/`, `hooks/` | Render UI; call the REST API over HTTP.                                                   | Import Firestore or the Admin SDK directly. |
+| **Backend — HTTP** | `app/api/**/route.ts`                      | Thin controllers: authenticate, check role, Zod-validate, call a service.                 | Hold business/data logic inline.            |
+| **Backend — core** | `lib/`                                     | Data access (`ProductRepository`), auth, validation — framework-agnostic pure TypeScript. | Import React or anything HTTP-specific.     |
 
 Two consequences of this split:
 
@@ -126,13 +127,13 @@ extraction path above if independent scaling is ever needed. See
 The significant calls we made, each with a one-line summary and a pointer to the full reasoning.
 These are the calls most worth understanding before changing the system.
 
-| Trade-off | What we chose and why | Detail |
-|---|---|---|
-| **One app vs. split frontend/backend** | A single Next.js app (UI + API). Simpler to run and explain; the data access layer stays separable if a split is ever needed. | ADR [0002](decisions/0002-tech-stack-nextjs-firebase-firestore.md) |
-| **REST vs. GraphQL** | REST via Route Handlers. GraphQL auto-gen targets SQL, not Firestore, and single-entity CRUD doesn't need it. | ADR [0003](decisions/0003-rest-over-graphql.md) |
+| Trade-off                                  | What we chose and why                                                                                                                                           | Detail                                                                                                                              |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **One app vs. split frontend/backend**     | A single Next.js app (UI + API). Simpler to run and explain; the data access layer stays separable if a split is ever needed.                                   | ADR [0002](decisions/0002-tech-stack-nextjs-firebase-firestore.md)                                                                  |
+| **REST vs. GraphQL**                       | REST via Route Handlers. GraphQL auto-gen targets SQL, not Firestore, and single-entity CRUD doesn't need it.                                                   | ADR [0003](decisions/0003-rest-over-graphql.md)                                                                                     |
 | **Session cookies vs. client-held tokens** | Admin-SDK-verified httpOnly session cookie. Resists XSS token theft and keeps the OWASP story clean; costs an extra token-exchange step and an admin seed path. | ADR [0004](decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md) · [design/authorization.md](design/authorization.md) |
-| **Scale now vs. deferred** | Build read-cheap shapes now (cursor pagination, aggregate counters); defer sharded counters and full multi-tenancy until a trigger demands them. | ADR [0006](decisions/0006-scalability-posture.md) · [design/scalability.md](design/scalability.md) |
-| **Thoughtful tests vs. 100% coverage** | Unit-test the security-critical paths + deny branches; Playwright e2e for the integrated flows (incl. viewer-403); no blanket coverage mandate. | ADR [0009](decisions/0009-testing-strategy.md) · [core-beliefs.md](core-beliefs.md) #9 |
+| **Scale now vs. deferred**                 | Build read-cheap shapes now (cursor pagination, aggregate counters); defer sharded counters and full multi-tenancy until a trigger demands them.                | ADR [0006](decisions/0006-scalability-posture.md) · [design/scalability.md](design/scalability.md)                                  |
+| **Thoughtful tests vs. 100% coverage**     | Unit-test the security-critical paths + deny branches; Playwright e2e for the integrated flows (incl. viewer-403); no blanket coverage mandate.                 | ADR [0009](decisions/0009-testing-strategy.md) · [core-beliefs.md](core-beliefs.md) #9                                              |
 
 ## Docs organization
 

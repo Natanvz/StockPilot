@@ -34,18 +34,18 @@ graph is committed so it's available from a fresh clone.
 A **post-commit hook** (installed via `graphify hook install`) auto-rebuilds the graph from the
 **code** files that changed in each commit. It ignores doc-only changes — after a commit that only
 touches `docs/**`/`*.md`, refresh the graph manually with `/graphify --update`. The hook's rebuild
-lands *after* the commit, so fold any resulting `graphify-out/` diff into a small follow-up commit.
+lands _after_ the commit, so fold any resulting `graphify-out/` diff into a small follow-up commit.
 
 ## Where things go
 
-| What | Where |
-|---|---|
-| Stack + directory layout | `docs/architecture.md` |
-| Hard rules / principles | `docs/core-beliefs.md` |
-| New ADR | `docs/decisions/NNNN-title.md` (+ update `index.md`) |
-| Implementation plan | `docs/plans/NNNN-title-implementation-plan.md` |
-| Detailed design (schema, auth, scalability, UI) | `docs/design/` |
-| Feature reference (current behavior) | `docs/features/` |
-| Process/how-to guides | `docs/guides/` |
-| Env var template | `.env.example` (committed, empty) |
-| Real secrets | `.env.local` (gitignored) |
+| What                                            | Where                                                |
+| ----------------------------------------------- | ---------------------------------------------------- |
+| Stack + directory layout                        | `docs/architecture.md`                               |
+| Hard rules / principles                         | `docs/core-beliefs.md`                               |
+| New ADR                                         | `docs/decisions/NNNN-title.md` (+ update `index.md`) |
+| Implementation plan                             | `docs/plans/NNNN-title-implementation-plan.md`       |
+| Detailed design (schema, auth, scalability, UI) | `docs/design/`                                       |
+| Feature reference (current behavior)            | `docs/features/`                                     |
+| Process/how-to guides                           | `docs/guides/`                                       |
+| Env var template                                | `.env.example` (committed, empty)                    |
+| Real secrets                                    | `.env.local` (gitignored)                            |

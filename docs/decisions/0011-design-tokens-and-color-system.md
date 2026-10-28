@@ -13,7 +13,7 @@ change a find-and-replace.
 ## Decision
 
 - **Design tokens as CSS custom properties** on `:root`, with **semantic (role-based) names**, not
-  raw color names. Tokens describe *purpose*: `--background`, `--foreground`, `--card`, `--muted`,
+  raw color names. Tokens describe _purpose_: `--background`, `--foreground`, `--card`, `--muted`,
   `--primary`, `--primary-foreground`, `--border`, `--ring`, plus status roles `--success`,
   `--warning`, `--destructive`. A component uses `bg-primary`, never `bg-[#2563eb]`.
 - **Light/dark via a second token set** under a `.dark` selector (toggled by next-themes). Components

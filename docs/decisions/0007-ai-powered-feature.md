@@ -11,7 +11,7 @@ the first version; the effort went to role-based UI, search/pagination, and CI/C
 into the core work. This ADR records the design so the decision is deliberate and the feature is
 ready to pick up.
 
-(Building StockPilot *with* AI tools like Claude Code — see [../guides/tooling.md](../guides/tooling.md)
+(Building StockPilot _with_ AI tools like Claude Code — see [../guides/tooling.md](../guides/tooling.md)
 — is a separate thing from this in-product AI feature.)
 
 ## Decision (proposed)

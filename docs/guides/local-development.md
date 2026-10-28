@@ -37,7 +37,7 @@ custom claim via the Admin SDK against the emulator):
 npm run seed:admin -- you@example.com
 ```
 
-*(Exact script name confirmed in Phase 2 — auth.)*
+_(Exact script name confirmed in Phase 2 — auth.)_
 
 ## Deploying with a real Firebase project
 

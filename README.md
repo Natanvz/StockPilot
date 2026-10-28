@@ -33,13 +33,13 @@ Firebase Emulator Suite. To deploy, create a free Firebase project and fill in `
 
 ## What's inside
 
-| Area | Summary | Detail |
-|---|---|---|
-| **Architecture** | One Next.js app: App Router pages + Route Handlers (the Node API), a Firestore data access layer, Firebase Auth. | [docs/architecture.md](docs/architecture.md) |
-| **Database schema** | `products` and `users` collections in Firestore; indexing and scale notes (multi-tenancy, 10× growth). | [docs/design/database-schema.md](docs/design/database-schema.md) |
+| Area                | Summary                                                                                                                                                        | Detail                                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Architecture**    | One Next.js app: App Router pages + Route Handlers (the Node API), a Firestore data access layer, Firebase Auth.                                               | [docs/architecture.md](docs/architecture.md)                                                                                                       |
+| **Database schema** | `products` and `users` collections in Firestore; indexing and scale notes (multi-tenancy, 10× growth).                                                         | [docs/design/database-schema.md](docs/design/database-schema.md)                                                                                   |
 | **Security & auth** | Firebase ID token verified server-side via the Admin SDK, stored in an httpOnly session cookie; roles via custom claims; every write re-checked on the server. | [docs/design/authorization.md](docs/design/authorization.md) · ADR [0004](docs/decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md) |
-| **Code quality** | ESLint + Prettier + TypeScript strict, enforced by a pre-commit hook and GitHub Actions CI. | [docs/guides/code-quality.md](docs/guides/code-quality.md) · ADR [0005](docs/decisions/0005-code-quality-enforcement.md) |
-| **Core beliefs** | The non-negotiable rules this codebase holds to. | [docs/core-beliefs.md](docs/core-beliefs.md) |
+| **Code quality**    | ESLint + Prettier + TypeScript strict, enforced by a pre-commit hook and GitHub Actions CI.                                                                    | [docs/guides/code-quality.md](docs/guides/code-quality.md) · ADR [0005](docs/decisions/0005-code-quality-enforcement.md)                           |
+| **Core beliefs**    | The non-negotiable rules this codebase holds to.                                                                                                               | [docs/core-beliefs.md](docs/core-beliefs.md)                                                                                                       |
 
 ## Trade-offs
 

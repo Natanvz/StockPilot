@@ -6,7 +6,7 @@
 ## Context
 
 StockPilot is a new project. Before writing code, we wanted a home for process and architecture
-documentation and a way to record *why* decisions were made, so a future contributor can understand
+documentation and a way to record _why_ decisions were made, so a future contributor can understand
 and defend each call and the README can carry honest architecture notes and trade-offs. Capturing
 reasoning as we go is cheaper and more honest than reconstructing it at the end.
 

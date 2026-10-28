@@ -16,7 +16,7 @@ Heavy libraries are fast to start but hard to theme deeply and lock us into thei
 - **Tailwind CSS** for styling — utility-first, consistent spacing/size scale, no parallel CSS files
   drifting from markup. Repetition is avoided by extracting components, not by copy-pasting classes.
 - **shadcn/ui** for the component layer: accessible **Radix UI** primitives, styled with Tailwind,
-  **copied into the repo** (`components/ui/`) so we *own* the code — no black-box dependency, full
+  **copied into the repo** (`components/ui/`) so we _own_ the code — no black-box dependency, full
   freedom to theme and extend.
 - **class-variance-authority (CVA)** for component variants (e.g. a `Button` with `variant` /
   `size`), so one component defines all its looks in one place instead of many near-duplicate

@@ -12,25 +12,25 @@ collections, so the model is shaped around the queries the dashboard actually ru
 
 One document per product.
 
-| Field | Type | Notes |
-|---|---|---|
-| `name` | string | 1–100 chars. |
-| `category` | string | Free text for now; a `categories` collection is a later option. |
-| `price` | number | **Integer, in cents** — avoids floating-point money errors. `1999` = $19.99. |
-| `status` | string | `"active"` or `"inactive"`. |
-| `ownerId` | string | `uid` of the user who created it. Enables per-owner scoping and future multi-tenancy. |
-| `createdAt` | timestamp | Set on create. |
-| `updatedAt` | timestamp | Set on every write. |
+| Field       | Type      | Notes                                                                                 |
+| ----------- | --------- | ------------------------------------------------------------------------------------- |
+| `name`      | string    | 1–100 chars.                                                                          |
+| `category`  | string    | Free text for now; a `categories` collection is a later option.                       |
+| `price`     | number    | **Integer, in cents** — avoids floating-point money errors. `1999` = $19.99.          |
+| `status`    | string    | `"active"` or `"inactive"`.                                                           |
+| `ownerId`   | string    | `uid` of the user who created it. Enables per-owner scoping and future multi-tenancy. |
+| `createdAt` | timestamp | Set on create.                                                                        |
+| `updatedAt` | timestamp | Set on every write.                                                                   |
 
 ### `users/{uid}`
 
 One document per user, keyed by the Firebase Auth `uid`.
 
-| Field | Type | Notes |
-|---|---|---|
-| `email` | string | From the Firebase Auth record. |
-| `role` | string | `"admin"` or `"viewer"`. **Mirror** of the Firebase custom claim, stored here so an admin can list users and their roles without the Admin SDK on a read. The claim is the source of truth for enforcement. |
-| `createdAt` | timestamp | Set on first sign-in. |
+| Field       | Type      | Notes                                                                                                                                                                                                       |
+| ----------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email`     | string    | From the Firebase Auth record.                                                                                                                                                                              |
+| `role`      | string    | `"admin"` or `"viewer"`. **Mirror** of the Firebase custom claim, stored here so an admin can list users and their roles without the Admin SDK on a read. The claim is the source of truth for enforcement. |
+| `createdAt` | timestamp | Set on first sign-in.                                                                                                                                                                                       |
 
 ## Why `price` is an integer in cents
 
@@ -62,9 +62,9 @@ collection on every load does not scale.
 
 **Multi-tenancy.** Add a `tenantId` to each product and scope every query by it. Two shapes:
 
-- *Flat with a field*: `products` stays one collection; every doc gets `tenantId`; all queries carry
+- _Flat with a field_: `products` stays one collection; every doc gets `tenantId`; all queries carry
   `where('tenantId', '==', ...)`. Simple to migrate to.
-- *Subcollection per tenant*: `tenants/{tenantId}/products/{productId}`. Strong natural isolation and
+- _Subcollection per tenant_: `tenants/{tenantId}/products/{productId}`. Strong natural isolation and
   simpler security rules, at the cost of cross-tenant queries (rarely needed by a tenant-scoped app).
 
 We'd choose the subcollection shape for isolation unless cross-tenant admin reporting became a core

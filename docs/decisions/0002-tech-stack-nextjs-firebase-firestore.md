@@ -11,7 +11,7 @@ chose between (a) one Next.js app holding both UI and API, and (b) a separate No
 
 ## Decision
 
-- **One Next.js 14 app, App Router**, in TypeScript strict mode. It serves both the React UI
+- **One Next.js 16 app (React 19), App Router**, in TypeScript strict mode. It serves both the React UI
   (`app/` pages) and the Node REST API (`app/api/**/route.ts` Route Handlers). No separate backend
   service.
 - **Firebase Authentication** for sign-up / sign-in.

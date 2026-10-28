@@ -39,8 +39,8 @@ compiler. Code must pass `npm run check` (type-check) with zero errors.
 
 ## 6. Every non-trivial decision gets an ADR
 
-If a choice affects more than one part of the app, or a future reader would want to know *why* and
-not just *what*, write an ADR in [decisions/](decisions/) before or with the change. See
+If a choice affects more than one part of the app, or a future reader would want to know _why_ and
+not just _what_, write an ADR in [decisions/](decisions/) before or with the change. See
 [decisions/index.md](decisions/index.md).
 
 ## 7. Code quality is enforced by tooling, not by memory
@@ -54,10 +54,10 @@ StockPilot is expected to handle multi-tenancy and 10× product growth. We don't
 don't have, but every data-shape and query choice is made with those targets in mind, and the
 reasoning (and what we deferred) is written down — see [design/scalability.md](design/scalability.md).
 Concretely: cursor pagination over offsets, targeted composite indexes, and maintained aggregate
-counters instead of full-collection scans for metrics. Scale-*awareness* is the rule; premature
+counters instead of full-collection scans for metrics. Scale-_awareness_ is the rule; premature
 scale machinery is not.
 
-## 9. Test the parts that would actually break — happy path *and* failure branches
+## 9. Test the parts that would actually break — happy path _and_ failure branches
 
 This is about where test effort goes, not about skipping the happy path. For the important logic we
 test **both** the happy path (admin creates a product → it's stored; valid sign-in → session set)

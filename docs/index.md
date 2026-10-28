@@ -12,10 +12,10 @@ This folder holds the process and architecture documentation for StockPilot. Sta
 
 ## Subfolders
 
-| Folder | What it holds |
-|---|---|
+| Folder                       | What it holds                                                                                                                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **[decisions/](decisions/)** | Architectural Decision Records (ADRs). Every non-trivial design call, append-only, with context / decision / consequences. Start at [decisions/index.md](decisions/index.md). |
-| **[design/](design/)** | Detailed definitions of things `architecture.md` only mentions briefly — database schema, authorization model, UI components. Start at [design/index.md](design/index.md). |
-| **[features/](features/)** | Current-behavior reference for each feature (routes, components, systems). Start at [features/index.md](features/index.md). |
-| **[guides/](guides/)** | How-to / process docs: running locally, code-quality rules, deployment. Start at [guides/index.md](guides/index.md). |
-| **[plans/](plans/)** | Implementation plans — `NNNN-title-implementation-plan.md` — that sequence larger pieces of work. Start at [plans/index.md](plans/index.md). |
+| **[design/](design/)**       | Detailed definitions of things `architecture.md` only mentions briefly — database schema, authorization model, UI components. Start at [design/index.md](design/index.md).    |
+| **[features/](features/)**   | Current-behavior reference for each feature (routes, components, systems). Start at [features/index.md](features/index.md).                                                   |
+| **[guides/](guides/)**       | How-to / process docs: running locally, code-quality rules, deployment. Start at [guides/index.md](guides/index.md).                                                          |
+| **[plans/](plans/)**         | Implementation plans — `NNNN-title-implementation-plan.md` — that sequence larger pieces of work. Start at [plans/index.md](plans/index.md).                                  |

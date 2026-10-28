@@ -19,7 +19,7 @@ is expensive and error-prone, so we avoid hard-coded user-facing text now.
   translator. (This mirrors a standing rule in the author's other projects.)
 - **English-first, growable**: only `en` exists now. Adding a locale = add `messages/<locale>.json`
   and register it; no component changes.
-- **Non-UI strings** (log messages, internal errors) are *not* translated — only user-facing text.
+- **Non-UI strings** (log messages, internal errors) are _not_ translated — only user-facing text.
 
 ## Consequences
 

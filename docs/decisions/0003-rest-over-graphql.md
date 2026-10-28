@@ -10,12 +10,12 @@ We considered whether to expose the API as REST or GraphQL, and specifically whe
 
 Findings on auto-generation:
 
-| Framework | Generates API from | Authorization model |
-|---|---|---|
-| Hasura | A SQL database (Postgres, etc.) | Declarative per-table permission rules keyed on a role + session variables (e.g. `x-hasura-user-id`) from JWT claims |
-| PostGraphile | Postgres schema | Postgres row-level security (RLS) + database roles |
-| Supabase `pg_graphql` | Postgres schema | Postgres RLS |
-| Prisma + Pothos/Nexus | Prisma schema (code-first, not pure auto-gen) | Written in resolver code / middleware |
+| Framework             | Generates API from                            | Authorization model                                                                                                  |
+| --------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Hasura                | A SQL database (Postgres, etc.)               | Declarative per-table permission rules keyed on a role + session variables (e.g. `x-hasura-user-id`) from JWT claims |
+| PostGraphile          | Postgres schema                               | Postgres row-level security (RLS) + database roles                                                                   |
+| Supabase `pg_graphql` | Postgres schema                               | Postgres RLS                                                                                                         |
+| Prisma + Pothos/Nexus | Prisma schema (code-first, not pure auto-gen) | Written in resolver code / middleware                                                                                |
 
 Two things stand out:
 
@@ -34,7 +34,7 @@ checks through resolver code.
 - Expose a **REST API** via Next.js Route Handlers.
 - Do **not** adopt GraphQL. Auto-generation doesn't apply to Firestore, and GraphQL's strengths
   don't pay off for single-entity CRUD.
-- Borrow the auto-gen tools' *spirit*: centralize authorization in one server-side place
+- Borrow the auto-gen tools' _spirit_: centralize authorization in one server-side place
   (`requireUser` / `requireRole` + the repository), not spread across handlers.
 
 ## Consequences

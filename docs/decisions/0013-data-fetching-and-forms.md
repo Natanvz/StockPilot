@@ -17,7 +17,7 @@ twice (once on the client, once on the server).
   the same query/mutation primitives instead of each re-implementing fetch + state.
 - **react-hook-form** for forms: minimal re-renders, a consistent form API across every form.
 - **Shared Zod schemas** via `@hookform/resolvers/zod`: the **same** schema in `lib/validation/`
-  validates the form on the client *and* the request body on the server (ADR
+  validates the form on the client _and_ the request body on the server (ADR
   [0004](0004-auth-session-cookies-admin-sdk-and-custom-claims.md) / core-belief #3). One rule, two
   consumers — no drift.
 - **A thin typed API client** wraps the REST calls so components call `productsApi.create(data)`, not

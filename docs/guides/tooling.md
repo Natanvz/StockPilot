@@ -9,7 +9,7 @@ Claude Code tooling are set up in this repo and worth calling out.
 
 ## skill-creator (Claude Code plugin)
 
-- **What it is**: an official Claude Code plugin for authoring and editing *skills* — small, reusable
+- **What it is**: an official Claude Code plugin for authoring and editing _skills_ — small, reusable
   instruction packs that teach Claude Code a repeatable, project-specific workflow (for example, "run
   our e2e suite and attach screenshots" or "scaffold a new ADR").
 - **Status**: enabled in [`.claude/settings.json`](../../.claude/settings.json) via

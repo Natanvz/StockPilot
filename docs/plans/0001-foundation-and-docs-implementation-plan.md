@@ -24,7 +24,7 @@ breadth. The README is the entry point to the repository.
 
 **Core features:**
 
-1. **Auth & authorization** — Firebase Auth sign-up/sign-in; protect routes *and* API; two roles
+1. **Auth & authorization** — Firebase Auth sign-up/sign-in; protect routes _and_ API; two roles
    (admin, viewer); OWASP basics (no secrets in URLs, proper sessions, secure tokens).
 2. **Product CRUD** — UI + backend to create/read/update/delete products. Each product: `name`,
    `category`, `price`, `status` (active/inactive), timestamp. Store in Firestore. Clean data access
@@ -46,7 +46,7 @@ trade-offs & scope, what's next, and the tooling used.
 
 - **Docs-first.** The documentation skeleton and seed ADRs land before any stack code (Phase 0).
   (ADR 0001.)
-- **Stack.** One Next.js 14 App Router app (UI + API), TypeScript strict, Firebase Auth, Firestore,
+- **Stack.** One Next.js 16 App Router app (React 19, UI + API), TypeScript strict, Firebase Auth, Firestore,
   Firebase emulator for local dev, data access layer isolating Firestore. (ADR 0002.)
 - **REST, not GraphQL.** Route Handlers. GraphQL auto-gen tools target SQL, not Firestore, and
   single-entity CRUD doesn't need GraphQL. (ADR 0003.)
@@ -78,7 +78,7 @@ done.
   authorization, scalability, ui-components); guides (code-quality, local-development, tooling);
   `CLAUDE.md`, `.claude/`, `.gitignore`; the graphify graph; README.
 - **Ships when**: the structure exists, every decision so far has an ADR, and the README links it
-  together. *(Done in this session.)*
+  together. _(Done in this session.)_
 
 ### Phase 1 — Scaffold + toolchain
 
@@ -153,13 +153,13 @@ done.
   core work.
 - **Coverage is thoughtful, not 100%** — security-critical paths are tested; exhaustive coverage is
   out of scope for this first version.
-- *(Add cuts here as they're made.)*
+- _(Add cuts here as they're made.)_
 
 ## What's next
 
-*(Finalized at Phase 8. Candidates: an AI feature — e.g. AI-generated product descriptions with a
+_(Finalized at Phase 8. Candidates: an AI feature — e.g. AI-generated product descriptions with a
 safe productionization write-up; observability — structured logging + error tracking; maintained
-aggregate counters for metrics at scale; a real multi-tenancy pass.)*
+aggregate counters for metrics at scale; a real multi-tenancy pass.)_
 
 ## AI tool usage (living — finalized at Phase 8)
 

@@ -47,11 +47,11 @@ Request carries the session cookie
 
 ## Failure modes
 
-| Situation | Result |
-|---|---|
-| No / invalid / expired session cookie | 401, redirect to sign-in |
-| Valid session, role too low for the action | 403 |
-| Valid request, invalid body | 400 with a Zod error summary (no raw internals leaked) |
+| Situation                                  | Result                                                 |
+| ------------------------------------------ | ------------------------------------------------------ |
+| No / invalid / expired session cookie      | 401, redirect to sign-in                               |
+| Valid session, role too low for the action | 403                                                    |
+| Valid request, invalid body                | 400 with a Zod error summary (no raw internals leaked) |
 
 ## Seeding the first admin
 
