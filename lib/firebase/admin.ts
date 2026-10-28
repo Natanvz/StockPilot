@@ -1,6 +1,7 @@
 import 'server-only';
 import { cert, getApps, initializeApp, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 
 /**
  * Server-side Firebase Admin SDK (ADR 0004). This is the only place that holds
@@ -42,4 +43,14 @@ export function getAdminAuth(): Auth {
     cachedAuth = getAuth(createAdminApp());
   }
   return cachedAuth;
+}
+
+let cachedDb: Firestore | null = null;
+
+/** Lazily initialize Admin Firestore (auto-detects FIRESTORE_EMULATOR_HOST locally). */
+export function getAdminDb(): Firestore {
+  if (!cachedDb) {
+    cachedDb = getFirestore(createAdminApp());
+  }
+  return cachedDb;
 }
