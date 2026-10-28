@@ -33,8 +33,9 @@ Two layers, each owning what it is best at:
 5. Filter / sort / search / cursor pagination behave.
 6. Signed-out access to `/dashboard` redirects to sign-in.
 
-- **Screenshot proofs.** Playwright captures a screenshot of each flow; these are committed (e.g.
-  under `e2e/screenshots/`) and referenced from the docs so the UI can be seen without running it.
+- **Screenshot proofs.** Playwright captures a screenshot at the key flows (`e2e/screenshots/`);
+  CI uploads them (plus the HTML report) as build artifacts, so the UI can be seen without running
+  it. They're generated, so they're gitignored rather than committed.
 - **CI.** The GitHub Actions workflow (ADR [0005](0005-code-quality-enforcement.md)) boots the
   emulator, builds the app, and runs Playwright headless. The suite is kept to the flows above so CI
   stays under a couple of minutes.

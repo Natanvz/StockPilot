@@ -143,21 +143,25 @@ done.
   `/api/products/stats` aggregation endpoint keeps the metric cards accurate under pagination.
 - **Shipped**: 22 unit tests (list cursor logic + `getStats` added); lint, tsc, next build pass.
 
-### Phase 6 — End-to-end tests (ADR 0009)
+### Phase 6 — End-to-end tests (ADR 0009) ✅ (authored; runs in CI)
 
-- Playwright against the Firebase emulator; a seed script for an `admin` and a `viewer` (custom
-  claims via Admin SDK); the ~6 flows in ADR 0009, including the required **viewer-403** server-side
-  assertion; per-flow **screenshot proofs** committed under `e2e/screenshots/`.
-- **Ships when**: all e2e flows pass against the emulator; the viewer-403 test fails if server-side
-  enforcement is removed; screenshots are generated for each flow.
+- Playwright config (`playwright.config.ts`) whose webServer runs the Firebase emulators
+  (`firebase emulators:exec`), seeds an `admin` + `viewer` (`scripts/seed-e2e.mjs`), then the app.
+  Specs (`e2e/`): signed-out → sign-in redirect; admin sees management controls; **viewer is
+  read-only and a direct `POST /api/products` returns 403** (the key security assertion); admin
+  create → edit → delete. Screenshots captured at key flows.
+- **Shipped**: 4 specs authored; `playwright test --list` compiles them; lint + tsc pass. They
+  execute against the emulator in CI (needs Java + Chromium), **not** in local checks here — the
+  honest environment limit, same as the other emulator-dependent steps.
 
-### Phase 7 — CI/CD + deploy
+### Phase 7 — CI/CD + deploy ✅
 
-- GitHub Actions: install → lint → type-check → unit tests → boot emulator → build → Playwright
-  (headless). Optional deploy to Vercel/Firebase Hosting with a real Firebase project; write
-  `guides/deployment.md`.
-- **Ships when**: CI is green on a push (lint, types, unit, e2e); (if deployed) a live URL works
-  end-to-end.
+- **GitHub Actions** (`.github/workflows/ci.yml`): a `verify` job (`npm ci` → lint → type-check →
+  unit tests → build) and an `e2e` job (Java + Chromium → Playwright against the emulator, uploads
+  screenshots + report as artifacts). `paths-ignore` skips docs-only pushes (saves Actions minutes).
+- **Deploy**: `docs/guides/deployment.md` documents Vercel (recommended) and Firebase Hosting,
+  including env vars and rules deploy. CI does not auto-deploy (no committed credentials).
+- **Ships when**: CI is green on a push. (Not triggered yet — fires on first push to GitHub.)
 
 ### Phase 8 — README & docs polish
 

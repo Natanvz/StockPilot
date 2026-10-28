@@ -30,6 +30,14 @@ const eslintConfig = defineConfig([
       globals: { process: 'readonly', console: 'readonly' },
     },
   },
+  // e2e specs: sequential flows legitimately repeat strings and run long.
+  {
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+    rules: {
+      'max-lines-per-function': 'off',
+      'sonarjs/no-duplicate-string': 'off',
+    },
+  },
   // Keep ESLint out of formatting decisions — Prettier owns those.
   prettier,
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'graphify-out/**']),

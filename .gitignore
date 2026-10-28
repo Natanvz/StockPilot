@@ -26,10 +26,11 @@ next-env.d.ts
 # Test / coverage output
 coverage/
 
-# Playwright (transient run output; committed proofs live in e2e/screenshots/)
+# Playwright (transient run output; screenshots are uploaded as CI artifacts)
 test-results/
 playwright-report/
 .playwright/
+e2e/screenshots/
 
 # Firebase emulator data & logs
 .firebase/
