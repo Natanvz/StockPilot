@@ -1,6 +1,6 @@
 # Implementation plan — Foundation, documentation, and the full build sequence
 
-**Status**: Active
+**Status**: Completed (Phases 0–8)
 **Date**: 2026-10-28
 **Related ADRs**: [0001](../decisions/0001-adopt-docs-and-adr-structure.md),
 [0002](../decisions/0002-tech-stack-nextjs-firebase-firestore.md),
@@ -163,33 +163,42 @@ done.
   including env vars and rules deploy. CI does not auto-deploy (no committed credentials).
 - **Ships when**: CI is green on a push. (Not triggered yet — fires on first push to GitHub.)
 
-### Phase 8 — README & docs polish
+### Phase 8 — README & docs polish ✅
 
-- Finalize every required README section, link-check the docs, and attach the e2e screenshots.
-- **Ships when**: the README satisfies every "must include" item; a fresh clone runs locally in
-  under 5 minutes following only the README.
+- Finalized the README: a Features list, setup (with the Java note + sign-up/seed-admin flow), a
+  Testing section, explicit Trade-offs / Scope / What's next / AI-tool-usage sections, and the
+  "What's inside" map into `docs/`. Link-checked the docs; the deployment guide is in.
+- **Shipped**: the README covers every item the brief requires and a fresh clone runs locally
+  following only the README. All phases (0–8) complete.
 
-## Trade-offs & scope (living — finalized at Phase 8)
+## Trade-offs & scope
 
-- **One Next.js app over a split frontend/backend** — simpler to run and explain; the data layer
-  stays cleanly separable if a split is ever needed.
-- **REST over GraphQL** — see ADR 0003.
-- **No AI feature** — focused on role-based UI + search/pagination + CI, which tie directly into the
-  core work.
-- **Coverage is thoughtful, not 100%** — security-critical paths are tested; exhaustive coverage is
-  out of scope for this first version.
-- _(Add cuts here as they're made.)_
+- **One Next.js app over a split frontend/backend** (ADR 0002) — simpler to run and explain; the
+  `lib/` data/auth layer stays cleanly extractable if a split is ever needed.
+- **REST over GraphQL** (ADR 0003) — GraphQL auto-gen targets SQL, not Firestore, and single-entity
+  CRUD doesn't need it.
+- **`cacheComponents` off** (ADR 0014) — the app is per-user/auth-gated, so there's little to
+  statically cache.
+- **No AI feature / observability in v1** (ADRs 0007, 0008, Proposed) — the effort went to the
+  required areas plus role-based UI, search/pagination, and CI.
+- **Client-side search over loaded pages** — Firestore has no native substring search; the
+  search-index path is documented (`design/scalability.md`).
+- **Thoughtful tests, not 100% coverage** — security-critical paths (data layer, guards, viewer-403)
+  are covered by unit + e2e; exhaustive coverage is out of scope.
 
 ## What's next
 
-_(Finalized at Phase 8. Candidates: an AI feature — e.g. AI-generated product descriptions with a
-safe productionization write-up; observability — structured logging + error tracking; maintained
-aggregate counters for metrics at scale; a real multi-tenancy pass.)_
+With another week, in rough priority order: (1) the **AI-powered feature** (ADR 0007); (2)
+**observability** (ADR 0008); (3) **server-side search** via a search index; (4) **maintained
+aggregate counters** for metrics at write-scale (ADR 0006); (5) a real **multi-tenancy** pass
+(subcollection-per-tenant).
 
-## AI tool usage (living — finalized at Phase 8)
+## AI tool usage
 
-StockPilot is an **AI-first project**, built with **Claude Code** (Claude Opus): AI drafted the docs
-structure, the ADRs, and this plan from the product goals and a short discussion. Correctness is kept by
-automated quality checks and tests (ESLint incl. complexity rules, TypeScript strict, Vitest, CI)
-plus human review. The tooling is described in [../guides/tooling.md](../guides/tooling.md); a
-per-area breakdown is added as phases complete.
+StockPilot is an **AI-first project**, built with **Claude Code** (Claude Opus): AI drafted the docs,
+the ADRs, the plan, and the implementation. Correctness is kept by automated quality checks and tests
+(ESLint incl. complexity rules, TypeScript strict, Vitest, Playwright, CI) plus human review. The
+tooling is described in [../guides/tooling.md](../guides/tooling.md). Per phase: AI wrote the
+docs/ADRs (Phase 0), scaffolded and configured the toolchain (Phase 1), and implemented auth, the
+data layer + API, the dashboard, pagination/search, and the e2e + CI setup (Phases 2–7), each in
+small reviewed commits that pass the automated gate.

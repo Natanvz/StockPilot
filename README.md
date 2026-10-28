@@ -10,6 +10,15 @@ See
 [docs/plans/0001-foundation-and-docs-implementation-plan.md](docs/plans/0001-foundation-and-docs-implementation-plan.md)
 for the build plan and [docs/decisions/](docs/decisions/) for why each call was made.
 
+## Features
+
+- Email/password **authentication** (Firebase) with secure httpOnly session cookies and two roles.
+- **Product CRUD** with Zod-validated input and role-gated writes (admins write, viewers read).
+- A **dashboard**: product table with search, status filter, and sort; cursor-based "Load more"
+  pagination; summary metrics (total, active, active catalog value).
+- **Role-based UI** enforced on the server, never just hidden in the client.
+- Light/dark theming and i18n-ready copy throughout.
+
 ## Run it locally (under 5 minutes)
 
 > Full, exact steps live in [docs/guides/local-development.md](docs/guides/local-development.md).
@@ -19,7 +28,7 @@ for the build plan and [docs/decisions/](docs/decisions/) for why each call was 
 # 1. Install dependencies
 npm install
 
-# 2. Start the Firebase emulators (Auth + Firestore) — no cloud project needed to develop
+# 2. Start the Firebase emulators (Auth + Firestore) — needs Java; no cloud project needed
 npm run emulators
 
 # 3. In a second terminal, start the app
@@ -27,9 +36,13 @@ npm run dev
 # open http://localhost:3000
 ```
 
-You do **not** need a real Firebase project to run and test locally — the app talks to the local
-Firebase Emulator Suite. To deploy, create a free Firebase project and fill in `.env.local` from
-`.env.example`; see the local-development guide.
+Open **/sign-up** to create an account — new users get the `viewer` role. To make yourself an admin,
+run `npm run seed:admin -- you@example.com` while the emulators are running, then sign out and back
+in.
+
+You do **not** need a real Firebase project to run locally — the app talks to the local Firebase
+Emulator Suite. To deploy, create a free project and fill `.env.local` from `.env.example`; see the
+[deployment guide](docs/guides/deployment.md).
 
 ## What's inside
 
@@ -40,6 +53,17 @@ Firebase Emulator Suite. To deploy, create a free Firebase project and fill in `
 | **Security & auth** | Firebase ID token verified server-side via the Admin SDK, stored in an httpOnly session cookie; roles via custom claims; every write re-checked on the server. | [docs/design/authorization.md](docs/design/authorization.md) · ADR [0004](docs/decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md) |
 | **Code quality**    | ESLint + Prettier + TypeScript strict, enforced by a pre-commit hook and GitHub Actions CI.                                                                    | [docs/guides/code-quality.md](docs/guides/code-quality.md) · ADR [0005](docs/decisions/0005-code-quality-enforcement.md)                           |
 | **Core beliefs**    | The non-negotiable rules this codebase holds to.                                                                                                               | [docs/core-beliefs.md](docs/core-beliefs.md)                                                                                                       |
+
+## Testing
+
+- **Unit** (Vitest) — the data access layer and the auth/role guards, including the deny branches
+  (a viewer's write is tested, not assumed): `npm run test`.
+- **End-to-end** (Playwright, against the Firebase emulator) — sign-in + redirect, role-gated UI, the
+  **viewer-gets-403** server check, and the admin create/edit/delete loop: `npm run test:e2e`
+  (needs Java + `npx playwright install`).
+- **CI** (GitHub Actions) runs lint, type-check, unit tests, build, and the e2e suite on every push.
+
+See ADR [0009](docs/decisions/0009-testing-strategy.md) for the testing strategy.
 
 ## Trade-offs
 
@@ -59,6 +83,18 @@ Each in-scope decision is an **Accepted** record in [docs/decisions/](docs/decis
 **AI-powered feature** (ADR [0007](docs/decisions/0007-ai-powered-feature.md)) and **observability**
 (ADR [0008](docs/decisions/0008-observability.md)). These are recorded as **Proposed** decisions —
 designed and ready to pick up, not yet implemented — and are the first items in "what's next."
+
+## What's next
+
+With another week, in rough priority order:
+
+1. **AI-powered feature** (ADR [0007](docs/decisions/0007-ai-powered-feature.md)) — e.g. generated
+   product descriptions, with the safe-productionization story already written.
+2. **Observability** (ADR [0008](docs/decisions/0008-observability.md)) — structured logging +
+   error tracking.
+3. **Server-side search** via a search index, replacing client-side search over loaded pages.
+4. **Maintained aggregate counters** for metrics at write-scale (ADR [0006](docs/decisions/0006-scalability-posture.md)).
+5. A real **multi-tenancy** pass (subcollection-per-tenant).
 
 ## AI tool usage
 
