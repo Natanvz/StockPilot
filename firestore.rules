@@ -1,0 +1,13 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // The browser never talks to Firestore directly (core-belief #2). All access
+    // is server-side via the Firebase Admin SDK, which bypasses these rules.
+    // So we deny every client request as a backstop: if a credential ever reaches
+    // the client SDK, it still cannot read or write data.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
