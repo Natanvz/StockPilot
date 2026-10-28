@@ -1,0 +1,15 @@
+{
+  "app": {
+    "name": "StockPilot"
+  },
+  "home": {
+    "tagline": "A mini SaaS dashboard for managing a product catalog.",
+    "scaffoldNote": "Scaffold is up — features land next."
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
