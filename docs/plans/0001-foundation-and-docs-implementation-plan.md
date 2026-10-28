@@ -121,19 +121,25 @@ done.
   friction); the committed docs-graph remains, and the post-commit hook can refresh code
   incrementally — not blocking.
 
-### Phase 4 — Dashboard UI
+### Phase 4 — Dashboard UI ✅
 
-- Product table; create/edit forms; delete with confirm; filter + sort controls; the summary metric
-  cards (total, active, revenue). Responsive + accessible. Fill `design/ui-components.md`.
-- **Ships when**: the dashboard lists products, filters/sorts, shows correct metrics, and the full
-  CRUD loop works from the UI on mobile and desktop widths.
+- Product table; create/edit form dialog; delete with confirm; filter + sort controls; summary metric
+  cards (total, active, active catalog value). Responsive + accessible. TanStack Query for
+  fetch/mutations.
+- **Shipped**: the dashboard lists products via `useProducts`, filters by status + sorts
+  (name/price/newest, client-side), shows the three metrics, and runs the full CRUD loop from the UI
+  (create/edit via a Radix dialog form, delete with a confirm dialog), with new primitives (Card,
+  Badge, Dialog, Input, Label). **Role-based UI landed here too** (Phase 5's first item): admin sees
+  New/Edit/Delete, viewer is read-only — and the server already enforces it (403). lint, tsc, 19
+  tests, and next build pass.
 
 ### Phase 5 — Additional features
 
-- **Role-based UI**: admin sees edit/delete controls, viewer is read-only (server already enforces).
-- **Search & pagination**: search box + Firestore cursor pagination (`startAfter` + `limit`).
-- **Ships when**: a viewer sees no write controls and is blocked server-side; search filters the
-  list; paging works forward/back via cursors, not offsets.
+- ✅ **Role-based UI** — delivered in Phase 4 (admin controls vs read-only viewer; server-enforced).
+- **Search & pagination** — remaining: a search box + Firestore cursor pagination (`startAfter` +
+  `limit`) replacing the current single list fetch.
+- **Ships when**: search filters the list; paging works forward/back via cursors, not offsets. (The
+  viewer-read-only + server-403 half is already shipped.)
 
 ### Phase 6 — End-to-end tests (ADR 0009)
 

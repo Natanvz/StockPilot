@@ -1,25 +1,12 @@
 import 'server-only';
 import { FieldValue, type DocumentData, type Timestamp } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase/admin';
-import type {
-  CreateProductInput,
-  ProductStatus,
-  UpdateProductInput,
-} from '@/lib/validation/product';
+import type { Product } from '@/lib/types/product';
+import type { CreateProductInput, UpdateProductInput } from '@/lib/validation/product';
+
+export type { Product };
 
 const COLLECTION = 'products';
-
-export type Product = {
-  id: string;
-  name: string;
-  category: string;
-  /** Integer, in cents. */
-  price: number;
-  status: ProductStatus;
-  ownerId: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
 
 function isoOrNull(value: unknown): string | null {
   return value ? (value as Timestamp).toDate().toISOString() : null;
