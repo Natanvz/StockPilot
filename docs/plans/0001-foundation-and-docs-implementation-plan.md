@@ -108,13 +108,16 @@ done.
   Also decided ADR 0014 (disable `cacheComponents`). Live emulator sign-in is exercised in the Phase
   6 e2e suite (needs Java + the running emulator, not run in CI-less local checks here).
 
-### Phase 3 — Data layer + Product CRUD API
+### Phase 3 — Data layer + Product CRUD API ✅
 
-- `ProductRepository` over Firestore; Zod schemas in `lib/validation/`; Route Handlers for
+- `productRepository` over Firestore; Zod schemas in `lib/validation/product.ts`; Route Handlers for
   list/create/get/update/delete with role checks and validation; `firestore.rules` as the backstop.
-- **Ships when**: all five endpoints work against the emulator; an admin can write, a viewer gets
-  403 on writes; invalid bodies get 400; repository unit tests pass (mocked Firestore), deny paths
-  included.
+- **Shipped** (commits `946293d`, + this part): the five endpoints are implemented — `GET`/`POST`
+  `/api/products`, `GET`/`PATCH`/`DELETE` `/api/products/[id]`; reads require any user, writes
+  `requireRole('admin')` (viewer → 403), invalid bodies → 400 (Zod), missing → 404. 10 repository
+  unit tests (mocked Firestore) cover the mapping and the not-found/no-write branches; 19 tests
+  total. lint, tsc, and next build pass. Live emulator CRUD is exercised in the Phase 6 e2e suite.
+  The graphify code-graph refresh can now run (meaningful code exists) — done as a follow-up.
 
 ### Phase 4 — Dashboard UI
 
