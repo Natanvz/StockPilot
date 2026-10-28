@@ -11,5 +11,23 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System"
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create your account",
+    "email": "Email",
+    "password": "Password",
+    "signInSubmit": "Sign in",
+    "signUpSubmit": "Create account",
+    "toSignUp": "No account? Create one",
+    "toSignIn": "Already have an account? Sign in",
+    "signOut": "Sign out",
+    "invalidEmail": "Enter a valid email address.",
+    "passwordTooShort": "Password must be at least 6 characters.",
+    "error": "Could not authenticate. Check your details and try again."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "signedInAs": "Signed in as {email}"
   }
 }

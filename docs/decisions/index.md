@@ -57,3 +57,4 @@ Update both together in the same commit whenever a status changes.
 | [0011](0011-design-tokens-and-color-system.md)                   | Design tokens & color system (semantic CSS variables)                   | Accepted |
 | [0012](0012-internationalization.md)                             | Internationalization (next-intl, structured from day one)               | Accepted |
 | [0013](0013-data-fetching-and-forms.md)                          | Data fetching & forms (TanStack Query + react-hook-form + shared Zod)   | Accepted |
+| [0014](0014-disable-cachecomponents.md)                          | Disable Next.js `cacheComponents`                                       | Accepted |
