@@ -117,7 +117,9 @@ done.
   `requireRole('admin')` (viewer → 403), invalid bodies → 400 (Zod), missing → 404. 10 repository
   unit tests (mocked Firestore) cover the mapping and the not-found/no-write branches; 19 tests
   total. lint, tsc, and next build pass. Live emulator CRUD is exercised in the Phase 6 e2e suite.
-  The graphify code-graph refresh can now run (meaningful code exists) — done as a follow-up.
+  The graphify code-graph refresh stays deferred (Windows multiprocessing + junk-file scoping
+  friction); the committed docs-graph remains, and the post-commit hook can refresh code
+  incrementally — not blocking.
 
 ### Phase 4 — Dashboard UI
 
