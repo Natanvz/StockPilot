@@ -80,16 +80,21 @@ done.
 - **Ships when**: the structure exists, every decision so far has an ADR, and the README links it
   together. _(Done in this session.)_
 
-### Phase 1 — Scaffold + toolchain
+### Phase 1 — Scaffold + toolchain ✅
 
-- `create-next-app` (TS, App Router, ESLint), the directory layout from `architecture.md`, Prettier
-  (+ ESLint complexity rules, ADR 0005), Husky + lint-staged, `.env.example`, Firebase emulator
-  config (`firebase.json`, `firestore.rules`, `firestore.indexes.json`).
-- **Frontend foundation** (ADRs 0010–0013): Tailwind + shadcn/ui init with the semantic design
-  tokens and light/dark (`next-themes`); next-intl wired with `messages/en.json`; the TanStack Query
-  provider; `cn()` helper, lucide, and a first primitive or two (Button, Input).
-- **Ships when**: `npm run dev` serves a themed page against the emulator; a string renders via
-  `t()`; `npm run lint` + `npm run check` pass; the pre-commit hook runs.
+- `create-next-app` (Next.js 16, React 19, TS strict, App Router, Tailwind v4), the directory layout
+  from `architecture.md`, Prettier (+ ESLint complexity rules + sonarjs, ADR 0005), Husky +
+  lint-staged, `.env.example`, Firebase emulator config (`firebase.json`, `firestore.rules`,
+  `firestore.indexes.json`).
+- **Frontend foundation** (ADRs 0010–0013): Tailwind v4 semantic design tokens + light/dark
+  (`next-themes`); `cn()` helper + a `Button` primitive (CVA) as the shadcn-style model; next-intl
+  wired with `messages/en.json`; the TanStack Query provider; a themed landing page rendering via
+  `t()` with a light/dark toggle.
+- **Shipped** (commits `329cf81`, `49bc8ed`, `99a8c91`): `npm run lint`, `npm run check`, and
+  `npm run build` all pass; the pre-commit hook (lint-staged) runs; the themed page renders strings
+  via `t()`. Note: the app connects to the Firebase emulator in Phase 2 (auth); the config is in
+  place now. The graphify graph refresh to include code is deferred until Phase 3 (feature code
+  makes the code graph worthwhile).
 
 ### Phase 2 — Auth
 
