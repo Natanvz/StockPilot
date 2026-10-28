@@ -96,14 +96,17 @@ done.
   place now. The graphify graph refresh to include code is deferred until Phase 3 (feature code
   makes the code graph worthwhile).
 
-### Phase 2 — Auth
+### Phase 2 — Auth ✅
 
-- Firebase client + Admin SDK init; sign-up / sign-in / sign-out UI; `POST /api/auth/session` (set)
-  and logout (clear); `requireUser` / `requireRole` helpers; Next.js middleware guarding pages;
-  `seed:admin` step.
-- **Ships when**: a user can sign up (defaults to viewer), sign in, and get an httpOnly session
-  cookie; protected pages redirect when signed out; `requireRole` returns 403 for a viewer. Unit
-  tests cover the helpers' allow **and** deny branches.
+- Firebase client + Admin SDK init (both lazy); sign-up / sign-in / sign-out UI; `POST /api/auth/session`
+  (set) and `DELETE` (clear); `requireUser` / `requireRole` helpers; Next.js middleware guarding
+  `/dashboard`; `seed:admin` script.
+- **Shipped** (commits `05359f2`, `c41ccd9`, `120399b`, + this part): a user can sign up (defaults to
+  viewer), sign in, and receive an httpOnly/Secure/SameSite session cookie; `/dashboard` redirects to
+  sign-in when the cookie is absent (middleware) or invalid (server `getSessionUser`); `requireRole`
+  returns 403 for a viewer. 9 unit tests cover the guards' allow **and** deny branches (ADR 0009).
+  Also decided ADR 0014 (disable `cacheComponents`). Live emulator sign-in is exercised in the Phase
+  6 e2e suite (needs Java + the running emulator, not run in CI-less local checks here).
 
 ### Phase 3 — Data layer + Product CRUD API
 

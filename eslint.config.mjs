@@ -23,6 +23,13 @@ const eslintConfig = defineConfig([
   ...nextTs,
   sonarjs.configs.recommended,
   complexityRules,
+  // Node utility scripts (not app code): allow Node globals.
+  {
+    files: ['scripts/**/*.{mjs,js,ts}'],
+    languageOptions: {
+      globals: { process: 'readonly', console: 'readonly' },
+    },
+  },
   // Keep ESLint out of formatting decisions — Prettier owns those.
   prettier,
   globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'graphify-out/**']),
