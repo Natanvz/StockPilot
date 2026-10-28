@@ -1,7 +1,13 @@
 import 'server-only';
-import { FieldValue, type DocumentData, type Timestamp } from 'firebase-admin/firestore';
+import {
+  AggregateField,
+  FieldPath,
+  FieldValue,
+  Timestamp,
+  type DocumentData,
+} from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase/admin';
-import type { Product } from '@/lib/types/product';
+import type { Product, ProductCursor, ProductPage, ProductStats } from '@/lib/types/product';
 import type { CreateProductInput, UpdateProductInput } from '@/lib/validation/product';
 
 export type { Product };
@@ -32,13 +38,54 @@ export function toProduct(id: string, data: DocumentData): Product {
  * swappable (ADR 0002).
  */
 export const productRepository = {
-  async list(max = 50): Promise<Product[]> {
-    const snapshot = await getAdminDb()
+  /**
+   * One page of products, newest first, via cursor pagination (ADR 0006):
+   * `startAfter` on (createdAt, documentId) keeps paging cost flat regardless of
+   * how deep you are — never numeric offsets. `nextCursor` is null on the last page.
+   */
+  async list(
+    options: { limit?: number; cursor?: ProductCursor | null } = {},
+  ): Promise<ProductPage> {
+    const limit = options.limit ?? 20;
+    let query = getAdminDb()
       .collection(COLLECTION)
       .orderBy('createdAt', 'desc')
-      .limit(max)
+      .orderBy(FieldPath.documentId());
+
+    if (options.cursor) {
+      query = query.startAfter(
+        Timestamp.fromDate(new Date(options.cursor.createdAt)),
+        options.cursor.id,
+      );
+    }
+
+    const snapshot = await query.limit(limit).get();
+    const products = snapshot.docs.map((doc) => toProduct(doc.id, doc.data()));
+    const last = snapshot.docs.at(-1);
+    const nextCursor =
+      snapshot.docs.length === limit && last
+        ? { createdAt: toProduct(last.id, last.data()).createdAt ?? '', id: last.id }
+        : null;
+    return { products, nextCursor };
+  },
+
+  /**
+   * Catalog metrics, computed with Firestore aggregation queries so the dashboard
+   * reads a few numbers instead of scanning the collection (ADR 0006). At larger
+   * write volumes these move to maintained counter documents.
+   */
+  async getStats(): Promise<ProductStats> {
+    const collection = getAdminDb().collection(COLLECTION);
+    const totalSnap = await collection.count().get();
+    const activeSnap = await collection
+      .where('status', '==', 'active')
+      .aggregate({ count: AggregateField.count(), value: AggregateField.sum('price') })
       .get();
-    return snapshot.docs.map((doc) => toProduct(doc.id, doc.data()));
+    return {
+      total: totalSnap.data().count,
+      activeCount: activeSnap.data().count,
+      activeValueCents: activeSnap.data().value ?? 0,
+    };
   },
 
   async getById(id: string): Promise<Product | null> {

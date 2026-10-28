@@ -3,18 +3,18 @@
 import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { formatPrice } from '@/lib/format';
-import type { Product } from '@/lib/types/product';
+import type { ProductStats } from '@/lib/types/product';
 
-/** Summary metrics (ADR 0006 notes these move to maintained counters at scale). */
-export function MetricCards({ products }: { products: Product[] }) {
+/**
+ * Summary metrics from the stats endpoint (ADR 0006) — computed server-side with
+ * aggregation queries, so they stay accurate even though the list is paginated.
+ */
+export function MetricCards({ stats }: { stats?: ProductStats }) {
   const t = useTranslations('dashboard');
-  const active = products.filter((p) => p.status === 'active');
-  const value = active.reduce((sum, p) => sum + p.price, 0);
-
   const metrics = [
-    { label: t('metricTotal'), value: String(products.length) },
-    { label: t('metricActive'), value: String(active.length) },
-    { label: t('metricValue'), value: formatPrice(value) },
+    { label: t('metricTotal'), value: stats ? String(stats.total) : '—' },
+    { label: t('metricActive'), value: stats ? String(stats.activeCount) : '—' },
+    { label: t('metricValue'), value: stats ? formatPrice(stats.activeValueCents) : '—' },
   ];
 
   return (

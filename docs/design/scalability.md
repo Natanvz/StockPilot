@@ -88,8 +88,18 @@ Covered by the above: cursor pagination keeps list performance flat, maintained 
 collection grows from thousands to tens of thousands of products; the one thing to watch is the
 counter write rate, handled by sharding if needed.
 
+## Search
+
+The list is paged with cursors (server-side), and **search is client-side** over the pages already
+loaded (name/category substring). This is deliberate: Firestore has no native substring search, and
+bolting a prefix query onto the cursor-paged, sorted list would fight the ordering. At catalog scale
+this stays responsive because paging is cheap; when the catalog outgrows "load a few pages," search
+moves to a dedicated search index (Algolia/Typesense, or a lowercased prefix field), queried
+server-side — a swap behind the same `productsApi`/hook surface, not a UI rewrite.
+
 ## What we deliberately defer
 
+- Server-side search (a search index) — client-side over loaded pages for now; see above.
 - The sharded/distributed counter — documented, built only when write rate requires it.
 - A real caching layer for metrics — the counter already makes reads cheap.
 - Full multi-tenancy — single-tenant now; the migration path above is the plan, not today's code.

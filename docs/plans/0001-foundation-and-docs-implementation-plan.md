@@ -133,13 +133,15 @@ done.
   New/Edit/Delete, viewer is read-only — and the server already enforces it (403). lint, tsc, 19
   tests, and next build pass.
 
-### Phase 5 — Additional features
+### Phase 5 — Additional features ✅
 
 - ✅ **Role-based UI** — delivered in Phase 4 (admin controls vs read-only viewer; server-enforced).
-- **Search & pagination** — remaining: a search box + Firestore cursor pagination (`startAfter` +
-  `limit`) replacing the current single list fetch.
-- **Ships when**: search filters the list; paging works forward/back via cursors, not offsets. (The
-  viewer-read-only + server-403 half is already shipped.)
+- ✅ **Search & pagination** — `list` is now Firestore **cursor pagination** (`startAfter` on
+  (createdAt, documentId), `nextCursor` null on last page); the client uses a TanStack **infinite
+  query** with a "Load more" button; a **search box** filters by name/category (client-side over
+  loaded pages — the production search-index path is noted in `design/scalability.md`). A separate
+  `/api/products/stats` aggregation endpoint keeps the metric cards accurate under pagination.
+- **Shipped**: 22 unit tests (list cursor logic + `getStats` added); lint, tsc, next build pass.
 
 ### Phase 6 — End-to-end tests (ADR 0009)
 

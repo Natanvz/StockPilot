@@ -1,19 +1,35 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { productsApi } from '@/lib/api/products-client';
+import type { ProductCursor } from '@/lib/types/product';
 import type { UpdateProductInput } from '@/lib/validation/product';
 
 const PRODUCTS_KEY = ['products'] as const;
+const STATS_KEY = ['product-stats'] as const;
 
-/** Fetch the product list (TanStack Query owns caching + loading/error — ADR 0013). */
+/** Paginated product list (TanStack infinite query; cursor-based — ADR 0006). */
 export function useProducts() {
-  return useQuery({ queryKey: PRODUCTS_KEY, queryFn: productsApi.list });
+  return useInfiniteQuery({
+    queryKey: PRODUCTS_KEY,
+    queryFn: ({ pageParam }) => productsApi.list(pageParam),
+    initialPageParam: null as ProductCursor | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+  });
+}
+
+/** Catalog metrics (separate from the paged list so totals stay accurate). */
+export function useProductStats() {
+  return useQuery({ queryKey: STATS_KEY, queryFn: productsApi.stats });
 }
 
 function useInvalidateProducts() {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY });
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY }),
+      queryClient.invalidateQueries({ queryKey: STATS_KEY }),
+    ]);
 }
 
 export function useCreateProduct() {

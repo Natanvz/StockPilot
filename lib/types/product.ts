@@ -12,3 +12,12 @@ export type Product = {
   createdAt: string | null;
   updatedAt: string | null;
 };
+
+/** Opaque-ish cursor for list pagination: the last item's sort keys. */
+export type ProductCursor = { createdAt: string; id: string };
+
+/** One page of products plus the cursor for the next page (null when last). */
+export type ProductPage = { products: Product[]; nextCursor: ProductCursor | null };
+
+/** Catalog-wide metrics for the dashboard. */
+export type ProductStats = { total: number; activeCount: number; activeValueCents: number };

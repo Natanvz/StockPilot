@@ -4,12 +4,18 @@ import { requireRole, requireUser } from '@/lib/auth/guards';
 import { productRepository } from '@/lib/data/product-repository';
 import { createProductSchema } from '@/lib/validation/product';
 
-/** List products (any authenticated user). */
-export async function GET(): Promise<NextResponse> {
+/** List products, one cursor page at a time (any authenticated user). */
+export async function GET(request: Request): Promise<NextResponse> {
   try {
     await requireUser();
-    const products = await productRepository.list();
-    return NextResponse.json({ products });
+    const params = new URL(request.url).searchParams;
+    const limit = Math.min(Number(params.get('limit')) || 20, 100);
+    const cursorCreatedAt = params.get('cursorCreatedAt');
+    const cursorId = params.get('cursorId');
+    const cursor =
+      cursorCreatedAt && cursorId ? { createdAt: cursorCreatedAt, id: cursorId } : null;
+    const page = await productRepository.list({ limit, cursor });
+    return NextResponse.json(page);
   } catch (error) {
     return toErrorResponse(error);
   }
