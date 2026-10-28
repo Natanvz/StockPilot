@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Environment (real secrets — never commit; .env.example IS committed)
+.env
+.env.local
+.env.*.local
+
+# Test / coverage output
+coverage/
+
+# Playwright (transient run output; committed proofs live in e2e/screenshots/)
+test-results/
+playwright-report/
+.playwright/
+
+# Firebase emulator data & logs
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*-debug.log
+
+# Claude Code — personal/machine-local only; shared settings.json IS committed
+.claude/settings.local.json
+
+# graphify — commit the current graph; ignore cache, memory, dated snapshots, and local pointers
+graphify-out/cache/
+graphify-out/memory/
+graphify-out/[0-9][0-9][0-9][0-9]-*/
+graphify-out/.graphify_python
+graphify-out/.graphify_root
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.stackdump
+.vscode/
+.idea/
+.project
+.classpath
+.settings/

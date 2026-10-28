@@ -1,0 +1,162 @@
+{
+  ".claude/settings.json": {
+    "mtime": 1793196115.7221777,
+    "ast_hash": "b3cdfa464938b0fcfabcfd3112cd512f",
+    "semantic_hash": "b3cdfa464938b0fcfabcfd3112cd512f"
+  },
+  "CLAUDE.md": {
+    "mtime": 1793198507.9558074,
+    "ast_hash": "5b3b13be81648ebc6960ed078b0cb63f",
+    "semantic_hash": "5b3b13be81648ebc6960ed078b0cb63f"
+  },
+  "README.md": {
+    "mtime": 1793198687.2304564,
+    "ast_hash": "0469f34cbc0bc3b6294412adb1622d3a",
+    "semantic_hash": "0469f34cbc0bc3b6294412adb1622d3a"
+  },
+  "docs/architecture.md": {
+    "mtime": 1793203391.442953,
+    "ast_hash": "a69df512b2487f4e74b335ef00c31e43",
+    "semantic_hash": "a69df512b2487f4e74b335ef00c31e43"
+  },
+  "docs/core-beliefs.md": {
+    "mtime": 1793203403.6611753,
+    "ast_hash": "3058a23931ecb9e12baeb97ddd229b28",
+    "semantic_hash": "3058a23931ecb9e12baeb97ddd229b28"
+  },
+  "docs/decisions/0001-adopt-docs-and-adr-structure.md": {
+    "mtime": 1793198557.7425997,
+    "ast_hash": "d56e839031ffdd112a015759bb585bce",
+    "semantic_hash": "d56e839031ffdd112a015759bb585bce"
+  },
+  "docs/decisions/0002-tech-stack-nextjs-firebase-firestore.md": {
+    "mtime": 1793198573.6814933,
+    "ast_hash": "d5bd7f74d46bc3b6254540bd396c31b3",
+    "semantic_hash": "d5bd7f74d46bc3b6254540bd396c31b3"
+  },
+  "docs/decisions/0003-rest-over-graphql.md": {
+    "mtime": 1793198578.0488868,
+    "ast_hash": "67c5f2528d146edac2738da552dab889",
+    "semantic_hash": "67c5f2528d146edac2738da552dab889"
+  },
+  "docs/decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md": {
+    "mtime": 1793198585.6554248,
+    "ast_hash": "36c1097224c77d216b22543b0f49ce2b",
+    "semantic_hash": "36c1097224c77d216b22543b0f49ce2b"
+  },
+  "docs/decisions/0005-code-quality-enforcement.md": {
+    "mtime": 1793198597.9284964,
+    "ast_hash": "fcba363de5dec3a687c53da56b279b16",
+    "semantic_hash": "fcba363de5dec3a687c53da56b279b16"
+  },
+  "docs/decisions/0006-scalability-posture.md": {
+    "mtime": 1793198616.2812989,
+    "ast_hash": "01187f059591384aac3e3d062cd13dd6",
+    "semantic_hash": "01187f059591384aac3e3d062cd13dd6"
+  },
+  "docs/decisions/0007-ai-powered-feature.md": {
+    "mtime": 1793198629.3340847,
+    "ast_hash": "d0936e3f2361c60bb7ee95adce3c1adf",
+    "semantic_hash": "d0936e3f2361c60bb7ee95adce3c1adf"
+  },
+  "docs/decisions/0008-observability.md": {
+    "mtime": 1793198718.3955433,
+    "ast_hash": "24a4f591a2e8408d7c7c8947a1fb61e6",
+    "semantic_hash": "24a4f591a2e8408d7c7c8947a1fb61e6"
+  },
+  "docs/decisions/index.md": {
+    "mtime": 1793203358.8500934,
+    "ast_hash": "015e02489e96cf643d3066d7e019b06d",
+    "semantic_hash": "015e02489e96cf643d3066d7e019b06d"
+  },
+  "docs/design/authorization.md": {
+    "mtime": 1793193930.230492,
+    "ast_hash": "209712e15efc2c4dfe0f5cd5596885fb",
+    "semantic_hash": "209712e15efc2c4dfe0f5cd5596885fb"
+  },
+  "docs/design/database-schema.md": {
+    "mtime": 1793193914.2434525,
+    "ast_hash": "0a750addf200bed39c3aa53f40261cc5",
+    "semantic_hash": "0a750addf200bed39c3aa53f40261cc5"
+  },
+  "docs/design/index.md": {
+    "mtime": 1793195818.148401,
+    "ast_hash": "36aab87271c4b06d9147cdf13842c6ef",
+    "semantic_hash": "36aab87271c4b06d9147cdf13842c6ef"
+  },
+  "docs/design/scalability.md": {
+    "mtime": 1793198533.3169022,
+    "ast_hash": "c356b94ced866ea29fd613237256939b",
+    "semantic_hash": "c356b94ced866ea29fd613237256939b"
+  },
+  "docs/design/ui-components.md": {
+    "mtime": 1793203380.243531,
+    "ast_hash": "d56d19503cf7a9bec0c6f650ddad535a",
+    "semantic_hash": "d56d19503cf7a9bec0c6f650ddad535a"
+  },
+  "docs/features/index.md": {
+    "mtime": 1793193941.208052,
+    "ast_hash": "3246b6c4308838a5c26376a5d9684448",
+    "semantic_hash": "3246b6c4308838a5c26376a5d9684448"
+  },
+  "docs/guides/code-quality.md": {
+    "mtime": 1793198537.1681764,
+    "ast_hash": "f71bdf29a30dcf8d238aa64eac9b8b58",
+    "semantic_hash": "f71bdf29a30dcf8d238aa64eac9b8b58"
+  },
+  "docs/guides/index.md": {
+    "mtime": 1793198274.0002286,
+    "ast_hash": "1477094d5aecbac5f6e8dd5df44096f1",
+    "semantic_hash": "1477094d5aecbac5f6e8dd5df44096f1"
+  },
+  "docs/guides/local-development.md": {
+    "mtime": 1793193963.3844087,
+    "ast_hash": "d319cb744b333a4df6bccdc634890316",
+    "semantic_hash": "d319cb744b333a4df6bccdc634890316"
+  },
+  "docs/index.md": {
+    "mtime": 1793195744.1169639,
+    "ast_hash": "6dfb7da644e4a3d0b4ee72ee126d459e",
+    "semantic_hash": "6dfb7da644e4a3d0b4ee72ee126d459e"
+  },
+  "docs/plans/0001-foundation-and-docs-implementation-plan.md": {
+    "mtime": 1793203423.8098178,
+    "ast_hash": "1f710fe2e318eb4f6969a160c52599f1",
+    "semantic_hash": "1f710fe2e318eb4f6969a160c52599f1"
+  },
+  "docs/plans/index.md": {
+    "mtime": 1793193968.9671514,
+    "ast_hash": "cacdf8c116bd7c29559a0c71a6c48963",
+    "semantic_hash": "cacdf8c116bd7c29559a0c71a6c48963"
+  },
+  "docs/decisions/0009-testing-strategy.md": {
+    "mtime": 1793198699.530315,
+    "ast_hash": "e290abc6d3127e29cf6631ec2dc17ba3",
+    "semantic_hash": "e290abc6d3127e29cf6631ec2dc17ba3"
+  },
+  "docs/decisions/0010-frontend-stack-and-component-model.md": {
+    "mtime": 1793203313.3664143,
+    "ast_hash": "b6b5666d090ead91acdf6ff02c1848ce",
+    "semantic_hash": "b6b5666d090ead91acdf6ff02c1848ce"
+  },
+  "docs/decisions/0011-design-tokens-and-color-system.md": {
+    "mtime": 1793203327.2430391,
+    "ast_hash": "dcb24c9c90ca9508ff76eca16049c1bc",
+    "semantic_hash": "dcb24c9c90ca9508ff76eca16049c1bc"
+  },
+  "docs/decisions/0012-internationalization.md": {
+    "mtime": 1793203338.9609988,
+    "ast_hash": "483f068cd78c3f2a016ca07793ac9177",
+    "semantic_hash": "483f068cd78c3f2a016ca07793ac9177"
+  },
+  "docs/decisions/0013-data-fetching-and-forms.md": {
+    "mtime": 1793203352.5790565,
+    "ast_hash": "9ed85966e5c17ba0bab0e4dcd8bab25a",
+    "semantic_hash": "9ed85966e5c17ba0bab0e4dcd8bab25a"
+  },
+  "docs/guides/tooling.md": {
+    "mtime": 1793198541.4049768,
+    "ast_hash": "2966818f708d92a7b58b1922b894c402",
+    "semantic_hash": "2966818f708d92a7b58b1922b894c402"
+  }
+}
