@@ -1,6 +1,6 @@
 # Implementation plan — Server-side pager, categories collection, string cleanup
 
-**Status**: Active
+**Status**: Complete
 **Date**: 2026-10-29
 **Related ADRs**: [0015](../decisions/0015-server-side-product-list-and-pager.md),
 [0016](../decisions/0016-categories-as-a-collection.md); evolves
@@ -9,8 +9,9 @@
 
 Follow-up work in ordered, reviewable parts.
 
-**Progress**: Part 1 ✅ done · Part 2 ✅ done (commit `7fd8e86`) · Part 3 🔨 in progress ·
-Part 4 ❌ dropped (deployment out of scope — [ADR 0017](../decisions/0017-deploy-to-vercel.md) Rejected).
+**Progress**: Part 1 ✅ done · Part 2 ✅ done (commit `7fd8e86`) · Part 3 ✅ done
+(3a `fc5360a`, 3b `6c8d7e1`, 3c `3c6182c`) · Part 4 ❌ dropped (deployment out of scope —
+[ADR 0017](../decisions/0017-deploy-to-vercel.md) Rejected).
 
 ## Part 1 — Code-constant cleanup (ADR 0013 follow-up) ✅ done
 
@@ -46,7 +47,7 @@ Move **status filter + sort to Firestore**, add a **count**, and replace "Load m
 - **Ships when**: paging works Prev/Next with accurate "Page X of Y · N items"; status filter + sort
   run server-side; page-size select works; lint/tsc/unit/e2e/build green.
 
-## Part 3 — Categories as a collection (ADR 0016) 🔨 in progress
+## Part 3 — Categories as a collection (ADR 0016) ✅ done
 
 Promote `category` from a free-text string on the product to its own collection with admin CRUD.
 Built in three green sub-commits:
