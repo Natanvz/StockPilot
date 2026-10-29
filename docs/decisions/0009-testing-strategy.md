@@ -50,3 +50,8 @@ Two layers, each owning what it is best at:
 - Screenshots give visual proof and double as living UI documentation.
 - A dedicated e2e phase is added to plan 0001 (Phase 6), after the dashboard and the additional
   features exist.
+- **e2e runs against a production build** (`next build` + `next start`), not `next dev`: under
+  headless Chromium the dev server's HMR websocket fails to connect, which stalls client hydration
+  and makes the UI non-interactive. A production build has no HMR, hydrates deterministically, and is
+  closer to what ships. Both roles are covered — admin (sees controls, full CRUD) and viewer
+  (read-only + the 403). The whole suite passes locally (4/4) and in CI.

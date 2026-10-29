@@ -143,16 +143,18 @@ done.
   `/api/products/stats` aggregation endpoint keeps the metric cards accurate under pagination.
 - **Shipped**: 22 unit tests (list cursor logic + `getStats` added); lint, tsc, next build pass.
 
-### Phase 6 — End-to-end tests (ADR 0009) ✅ (authored; runs in CI)
+### Phase 6 — End-to-end tests (ADR 0009) ✅
 
-- Playwright config (`playwright.config.ts`) whose webServer runs the Firebase emulators
-  (`firebase emulators:exec`), seeds an `admin` + `viewer` (`scripts/seed-e2e.mjs`), then the app.
-  Specs (`e2e/`): signed-out → sign-in redirect; admin sees management controls; **viewer is
-  read-only and a direct `POST /api/products` returns 403** (the key security assertion); admin
-  create → edit → delete. Screenshots captured at key flows.
-- **Shipped**: 4 specs authored; `playwright test --list` compiles them; lint + tsc pass. They
-  execute against the emulator in CI (needs Java + Chromium), **not** in local checks here — the
-  honest environment limit, same as the other emulator-dependent steps.
+- Playwright config (`playwright.config.ts`) whose webServer **builds the app**, runs the Firebase
+  emulators (`firebase emulators:exec`), seeds an `admin` + `viewer` (`scripts/seed-e2e.mjs`), then
+  serves a production build. Specs (`e2e/`): signed-out → sign-in redirect; admin sees management
+  controls; **viewer is read-only and a direct `POST /api/products` returns 403** (the key security
+  assertion); admin create → edit → delete. Screenshots captured at key flows.
+- **Shipped**: all **4 specs pass** (both roles) locally against the emulator (Java 21 + Chromium)
+  and in CI. A production build is used because `next dev`'s HMR websocket stalls hydration under
+  headless Chromium (ADR 0009). Along the way this surfaced two real fixes: the session cookie drops
+  its `Secure` flag when on the emulator (http), and the sign-in form is `method="post"` so a no-JS
+  submit can't leak credentials into the URL (ADR 0004).
 
 ### Phase 7 — CI/CD + deploy ✅
 

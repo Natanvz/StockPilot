@@ -58,7 +58,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
   });
 
   return (
-    <form onSubmit={onSubmit} className="bg-card w-full max-w-sm space-y-4 rounded-lg border p-6">
+    <form
+      method="post"
+      onSubmit={onSubmit}
+      className="bg-card w-full max-w-sm space-y-4 rounded-lg border p-6"
+    >
       <h1 className="text-xl font-semibold">{isSignUp ? t('signUpTitle') : t('signInTitle')}</h1>
 
       <div className="space-y-1.5">

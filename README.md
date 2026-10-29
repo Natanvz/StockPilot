@@ -25,23 +25,30 @@ for the build plan and [docs/decisions/](docs/decisions/) for why each call was 
 > This is the short version.
 
 ```bash
-# 1. Install dependencies
 npm install
+cp .env.example .env.local
 
-# 2. Start the Firebase emulators (Auth + Firestore) — needs Java; no cloud project needed
+# Start the Firebase emulators (Auth + Firestore). Needs Java on your PATH.
+# Data persists in ./.firebase-data, so it survives restarts.
 npm run emulators
 
-# 3. In a second terminal, start the app
-npm run dev
-# open http://localhost:3000
+# In a second terminal: create demo accounts (one admin, one viewer) — run once.
+npm run seed:users
+
+# In a second terminal: start the app
+npm run dev        # → http://localhost:3000
 ```
 
-Open **/sign-up** to create an account — new users get the `viewer` role. To make yourself an admin,
-run `npm run seed:admin -- you@example.com` while the emulators are running, then sign out and back
-in.
+**Sign in** at `/sign-in` with a demo account created by `seed:users`:
 
-You do **not** need a real Firebase project to run locally — the app talks to the local Firebase
-Emulator Suite. To deploy, create a free project and fill `.env.local` from `.env.example`; see the
+| Role               | Email                     | Password      |
+| ------------------ | ------------------------- | ------------- |
+| admin (full CRUD)  | `admin@stockpilot.local`  | `password123` |
+| viewer (read-only) | `viewer@stockpilot.local` | `password123` |
+
+Or register your own at `/sign-up` (new users are `viewer`); promote anyone with
+`npm run seed:admin -- their@email`. You do **not** need a real Firebase project to run locally. To
+deploy, create a free one and fill `.env.local` from `.env.example` — see the
 [deployment guide](docs/guides/deployment.md).
 
 ## What's inside

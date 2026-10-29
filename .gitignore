@@ -9,6 +9,7 @@ dist/
 next-env.d.ts
 *.tsbuildinfo
 .vercel
+AGENTS.md
 
 # Package manager extras
 .pnp
@@ -34,6 +35,7 @@ e2e/screenshots/
 
 # Firebase emulator data & logs
 .firebase/
+.firebase-data/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log

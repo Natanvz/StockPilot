@@ -31,8 +31,15 @@ Options considered:
 - **Server-side enforcement on every call.** Two helpers: `requireUser()` (valid session or 401) and
   `requireRole('admin')` (correct role or 403). The UI additionally hides controls a viewer can't
   use, but that is never the enforcement (core-belief #1).
-- **Route protection.** Next.js middleware guards pages; Route Handlers call the helpers above for
-  the API.
+- **Route protection.** A Next.js proxy (the `proxy.ts` convention, formerly "middleware") guards
+  pages; Route Handlers call the helpers above for the API.
+- **Cookie flags.** `httpOnly` + `SameSite=Lax` always; `Secure` in production — but **off when
+  running against the Firebase emulator** (`NEXT_PUBLIC_USE_FIREBASE_EMULATOR=1`), since local dev
+  and e2e are `http://`, where a `Secure` cookie would be dropped. Real deploys (no emulator) get
+  `Secure`.
+- **Sign-in form is `method="post"`.** Belt-and-braces for OWASP "no secrets in URLs": the JS handler
+  does the real work, but if it ever failed to run, the native fallback POSTs (never GET-leaks the
+  password into the URL).
 
 ## Consequences
 

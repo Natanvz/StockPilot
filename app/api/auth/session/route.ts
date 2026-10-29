@@ -8,6 +8,11 @@ import { createSessionCookie } from '@/lib/auth/session';
 
 const CreateSessionSchema = z.object({ idToken: z.string().min(1) });
 
+// Secure cookies in production, except when running against the Firebase emulator
+// (local dev and e2e are http://, where a Secure cookie would be dropped).
+const useEmulator = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === '1';
+const secureCookie = process.env.NODE_ENV === 'production' && !useEmulator;
+
 /** Exchange a Firebase ID token for an httpOnly session cookie. */
 export async function POST(request: Request): Promise<NextResponse> {
   const body: unknown = await request.json().catch(() => null);
@@ -21,7 +26,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const store = await cookies();
     store.set(SESSION_COOKIE, sessionCookie, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: secureCookie,
       sameSite: 'lax',
       path: '/',
       maxAge: SESSION_MAX_AGE_SECONDS,

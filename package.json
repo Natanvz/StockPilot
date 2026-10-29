@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "emulators": "firebase emulators:start",
+    "emulators": "firebase emulators:start --project=stockpilot-local --import=./.firebase-data --export-on-exit=./.firebase-data",
+    "seed:users": "node --env-file-if-exists=.env.local scripts/seed-users.mjs",
     "seed:admin": "node --env-file-if-exists=.env.local scripts/seed-admin.mjs",
     "prepare": "husky"
   },
