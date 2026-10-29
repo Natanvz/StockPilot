@@ -1,124 +1,147 @@
 # Graph Report - D:/Dev/Projects/Personal/StockPilot  (2026-10-28)
 
 ## Corpus Check
-- Corpus is ~12,243 words - fits in a single context window. You may not need a graph.
+- Corpus is ~25,532 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 141 nodes · 170 edges · 15 communities (9 shown, 6 thin omitted)
-- Extraction: 94% EXTRACTED · 5% INFERRED · 1% AMBIGUOUS · INFERRED: 9 edges (avg confidence: 0.76)
-- Token cost: 174,373 input · 9,000 output
+- 307 nodes · 559 edges · 22 communities (16 shown, 6 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 12 edges (avg confidence: 0.82)
+- Token cost: 186,862 input · 9,500 output
 
 ## Community Hubs (Navigation)
-- Architecture & Conventions
-- Roles, Auth & Firestore Schema
-- Security & Scalability Posture
-- Testing & Observability
-- Frontend Stack & Components
-- Code Quality & Tooling
-- i18n & Core Beliefs
-- AI Feature (proposed)
-- Scalability Mechanics
-- Icons
-- UX-State Components
-- Multi-tenancy
+- Product UI Components
+- Auth Model & Firestore Schema
+- Architecture & Core Beliefs
+- Products Data Layer & Hooks
+- Session & Roles
+- API Route Handlers & Guards
+- Auth UI & Client SDK
+- Dashboard & Filtering
+- Frontend Stack & Design
+- App Shell & Providers
+- Observability (deferred)
+- End-to-End Tests
+- Code-Quality Tooling
+- Next.js Config
+- Internationalization
+- E2E Seed
+- Demo-Users Seed
+- E2E Config
+- Admin Seed
 - Features Reference
-- Docs Index
-- Plans Index
 
 ## God Nodes (most connected - your core abstractions)
-1. `Next.js 14 App Router application` - 9 edges
-2. `ADR index and process` - 8 edges
-3. `StockPilot` - 7 edges
-4. `ADR 0004: Session cookies + custom-claim roles` - 6 edges
-5. `ADR 0005: Code-quality enforcement` - 6 edges
-6. `ADR 0006: Scalability posture` - 6 edges
-7. `Firebase Custom Claim` - 5 edges
-8. `ADR 0003: REST over GraphQL` - 5 edges
-9. `ADR 0009 — Testing strategy` - 5 edges
-10. `Playwright e2e tests` - 5 edges
+1. `cn()` - 15 edges
+2. `Architecture Overview` - 14 edges
+3. `Button()` - 10 edges
+4. `toErrorResponse()` - 10 edges
+5. `requireUser()` - 10 edges
+6. `Core Beliefs (hard constraints)` - 9 edges
+7. `Firestore Database Schema` - 9 edges
+8. `Scalability Posture` - 9 edges
+9. `requireRole()` - 8 edges
+10. `getSessionUser()` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `StockPilot` --references--> `Firebase Authentication`  [EXTRACTED]
-  README.md → docs/architecture.md
-- `StockPilot` --references--> `Cloud Firestore`  [EXTRACTED]
-  README.md → docs/architecture.md
-- `StockPilot` --implements--> `Next.js 14 App Router application`  [EXTRACTED]
-  README.md → docs/architecture.md
-- `Claude Code` --references--> `graphify knowledge graph`  [INFERRED]
-  README.md → CLAUDE.md
-- `Maintained aggregate counters (stats/products)` --conceptually_related_to--> `Dashboard summary metrics`  [INFERRED]
-  docs/decisions/0006-scalability-posture.md → README.md
+- `DashboardPage()` --calls--> `getSessionUser()`  [EXTRACTED]
+  app/(dashboard)/dashboard/page.tsx → lib/auth/session.ts
+- `StockPilot (mini SaaS product-catalog dashboard)` --cites--> `ADR 0007 — AI-powered feature (Proposed)`  [EXTRACTED]
+  README.md → docs/decisions/0007-ai-powered-feature.md
+- `Product CRUD with role-gated writes` --conceptually_related_to--> `Custom-claim roles (admin / viewer)`  [INFERRED]
+  README.md → docs/decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md
+- `POST()` --calls--> `createSessionCookie()`  [EXTRACTED]
+  app/api/auth/session/route.ts → lib/auth/session.ts
+- `GET()` --calls--> `toErrorResponse()`  [EXTRACTED]
+  app/api/products/[id]/route.ts → lib/api/respond.ts
+
+## Import Cycles
+- None detected.
 
 ## Hyperedges (group relationships)
-- **Protected Request Enforcement Chain** — docs_design_authorization_session_cookie, docs_design_authorization_require_user, docs_design_authorization_require_role, docs_plans_0001_foundation_and_docs_implementation_plan_zod_validation, docs_plans_0001_foundation_and_docs_implementation_plan_product_repository [EXTRACTED 1.00]
-- **Authenticated request flow (UI to Firestore)** — docs_architecture_route_handlers, docs_decisions_0004_auth_session_cookies_admin_sdk_and_custom_claims_require_user_role, docs_architecture_zod_validation, docs_architecture_data_access_layer, docs_architecture_firestore [EXTRACTED 1.00]
-- **Four quality pillars** — docs_architecture_layering, docs_core_beliefs_server_authorization, docs_decisions_0006_scalability_posture_adr, docs_decisions_0005_code_quality_enforcement_adr [EXTRACTED 1.00]
-- **Server-side auth model** — docs_architecture_firebase_admin_sdk, docs_architecture_session_cookie, docs_decisions_0004_auth_session_cookies_admin_sdk_and_custom_claims_custom_claims, docs_decisions_0004_auth_session_cookies_admin_sdk_and_custom_claims_require_user_role [EXTRACTED 1.00]
-- **StockPilot frontend stack** — docs_decisions_0010_frontend_stack_and_component_model_tailwind_css, docs_decisions_0010_frontend_stack_and_component_model_shadcn_ui, docs_decisions_0010_frontend_stack_and_component_model_class_variance_authority, docs_decisions_0010_frontend_stack_and_component_model_next_themes, docs_decisions_0011_design_tokens_and_color_system_design_tokens, docs_decisions_0012_internationalization_next_intl, docs_decisions_0013_data_fetching_and_forms_tanstack_query [EXTRACTED 1.00]
-- **Data/forms reuse chain** — docs_decisions_0013_data_fetching_and_forms_tanstack_query, docs_decisions_0013_data_fetching_and_forms_react_hook_form, docs_decisions_0013_data_fetching_and_forms_shared_zod_schemas, docs_decisions_0013_data_fetching_and_forms_typed_api_client, docs_decisions_0013_data_fetching_and_forms_ux_state_components [EXTRACTED 1.00]
-- **Testing strategy (unit + e2e on emulator)** — docs_decisions_0009_testing_strategy_vitest, docs_decisions_0009_testing_strategy_playwright, docs_decisions_0009_testing_strategy_firebase_local_emulator_suite, docs_decisions_0009_testing_strategy_viewer_403_assertion, docs_decisions_0009_testing_strategy_screenshot_proofs [EXTRACTED 1.00]
+- **Server-side authorization enforcement chain** — docs_core_beliefs_server_side_authorization, docs_decisions_0004_auth_session_cookies_admin_sdk_and_custom_claims_session_cookie, docs_decisions_0004_auth_session_cookies_admin_sdk_and_custom_claims_require_user_require_role, docs_decisions_0004_auth_session_cookies_admin_sdk_and_custom_claims_custom_claim_roles [INFERRED 0.85]
+- **Request flow: UI -> REST -> repository -> Firestore** — docs_architecture_rest_route_handlers, docs_architecture_zod_validation, docs_decisions_0002_tech_stack_nextjs_firebase_firestore_product_repository, docs_decisions_0002_tech_stack_nextjs_firebase_firestore_firestore [INFERRED 0.85]
+- **Scalability posture mechanisms** — docs_decisions_0006_scalability_posture_stateless_compute, docs_decisions_0006_scalability_posture_cursor_pagination, docs_decisions_0006_scalability_posture_aggregate_counters, docs_decisions_0006_scalability_posture_multi_tenancy [INFERRED 0.85]
+- **Frontend Stack** — docs_decisions_0010_frontend_stack_and_component_model_tailwind, docs_design_ui_components_shadcn, docs_design_ui_components_design_tokens, docs_design_ui_components_next_intl, docs_decisions_0013_data_fetching_and_forms_tanstack_query [INFERRED 0.85]
+- **Data Fetching & Forms Reuse Chain** — docs_decisions_0013_data_fetching_and_forms_tanstack_query, docs_decisions_0013_data_fetching_and_forms_react_hook_form, docs_decisions_0013_data_fetching_and_forms_zod, docs_decisions_0013_data_fetching_and_forms_typed_api_client [INFERRED 0.85]
+- **Firestore Scalability Posture** — docs_design_scalability_stateless_compute, docs_design_scalability_aggregate_counter, docs_design_scalability_cursor_pagination, docs_design_scalability_sharded_counter, docs_design_scalability_multi_tenancy [INFERRED 0.85]
 
-## Communities (15 total, 6 thin omitted)
+## Communities (22 total, 6 thin omitted)
 
-### Community 0 - "Architecture & Conventions"
-Cohesion: 0.11
-Nodes (25): ProductRepository data access layer, Firebase Local Emulator Suite, Cloud Firestore, GitHub Actions CI/CD, Layered separation of concerns, next-intl i18n, Next.js 14 App Router application, Next.js Route Handlers (REST API) (+17 more)
+### Community 0 - "Product UI Components"
+Cohesion: 0.09
+Nodes (32): DeleteDialog(), MetricCards(), ADR-0006, formSchema, FormValues, ProductFormDialog(), toDefaults(), ProductTable() (+24 more)
 
-### Community 1 - "Roles, Auth & Firestore Schema"
-Cohesion: 0.11
-Nodes (23): Admin Role, Authorization & Auth Model, Broken Access Control Protection, Firebase Admin SDK, Firebase Custom Claim, OWASP Basics Compliance, requireRole Helper, requireUser Helper (+15 more)
+### Community 1 - "Auth Model & Firestore Schema"
+Cohesion: 0.07
+Nodes (45): ADR 0014: Disable cacheComponents, Next.js cacheComponents, ADR Index & Structure, Authorization & Auth Model, Firebase Custom Claims, OWASP Basics Compliance, ProductRepository, Admin/Viewer Roles (+37 more)
 
-### Community 2 - "Security & Scalability Posture"
-Cohesion: 0.10
-Nodes (21): graphify knowledge graph, graphify post-commit hook, StockPilot, Firebase Admin SDK, Firebase Authentication, httpOnly session cookie, Stateless compute, No secrets in client, URLs, or logs (+13 more)
+### Community 2 - "Architecture & Core Beliefs"
+Cohesion: 0.08
+Nodes (44): CLAUDE.md Agent Instructions, graphify knowledge graph tooling, Layered separation (UI / HTTP / core), Architecture Overview, REST API via Next.js Route Handlers, TanStack Query + react-hook-form (frontend data/forms), Zod validation at every API boundary, No secrets in client, URLs, or logs (+36 more)
 
-### Community 3 - "Testing & Observability"
+### Community 3 - "Products Data Layer & Hooks"
+Cohesion: 0.09
+Nodes (24): ADR-0002, PRODUCTS_KEY, STATS_KEY, ADR-0006, JSON_HEADERS, productsApi, ADR-0013, isoOrNull() (+16 more)
+
+### Community 4 - "Session & Roles"
 Cohesion: 0.12
-Nodes (20): Firestore, requireUser / requireRole helpers, GitHub Actions CI, ADR 0008 — Observability, Observability (deferred), Performance monitoring (Firebase Performance / Web Vitals), requestId correlation, Error tracking (Sentry) (+12 more)
+Nodes (16): CreateSessionSchema, POST(), DashboardPage(), Role, ROLES, toRole(), ADR-0004, createSessionCookie() (+8 more)
 
-### Community 4 - "Frontend Stack & Components"
-Cohesion: 0.14
-Nodes (19): httpOnly session cookie, ADR 0010 — Frontend stack & component model, class-variance-authority (CVA), cn() helper (clsx + tailwind-merge), next-themes (light/dark), Radix UI primitives, shadcn/ui (owned components), Tailwind CSS (+11 more)
+### Community 5 - "API Route Handlers & Guards"
+Cohesion: 0.21
+Nodes (16): DELETE(), GET(), notFound(), PATCH(), RouteContext, GET(), POST(), GET() (+8 more)
 
-### Community 5 - "Code Quality & Tooling"
+### Community 6 - "Auth UI & Client SDK"
+Cohesion: 0.19
+Nodes (8): authenticate(), AuthForm(), Mode, SignOutButton(), getClientAuth(), Credentials, credentialsSchema, ADR-0013
+
+### Community 7 - "Dashboard & Filtering"
 Cohesion: 0.20
-Nodes (12): Code quality (guide), Complexity ceilings (lint-enforced), ESLint, Pre-commit hook (Husky + lint-staged), Prettier, sonarjs complexity rules, TypeScript strict mode, Guides index (+4 more)
+Nodes (13): Dashboard(), DashboardToolbar(), filterByStatus(), ResultsProps, searchProducts(), sortProducts(), ToolbarProps, FilterBar() (+5 more)
 
-### Community 6 - "i18n & Core Beliefs"
+### Community 8 - "Frontend Stack & Design"
+Cohesion: 0.19
+Nodes (14): ADR 0010 — Frontend stack & component model, shadcn/ui owned Radix primitives, Tailwind CSS, ADR 0013: Data Fetching & Forms, react-hook-form, TanStack Query, Thin Typed API Client, Reusable UX-State Components (+6 more)
+
+### Community 9 - "App Shell & Providers"
 Cohesion: 0.33
-Nodes (6): Core beliefs, Next.js App Router, ADR 0012 — Internationalization, JSON message catalogs per locale, next-intl, Scalability (design doc)
+Nodes (4): geistMono, geistSans, metadata, Providers()
 
-### Community 7 - "AI Feature (proposed)"
+### Community 10 - "Observability (deferred)"
+Cohesion: 0.40
+Nodes (6): ADR 0008 — Observability, Observability (deferred), Performance monitoring (Firebase Performance / Web Vitals), requestId correlation, Error tracking (Sentry), Structured logging (JSON lines)
+
+### Community 11 - "End-to-End Tests"
+Cohesion: 0.67
+Nodes (3): ADMIN, signIn(), VIEWER
+
+### Community 12 - "Code-Quality Tooling"
 Cohesion: 0.50
-Nodes (5): Server-side authorization enforcement, requireUser / requireRole helpers, ADR 0007: AI-powered feature (product-description generation), POST /api/products/:id/describe endpoint, Prompt-injection awareness
+Nodes (3): ADR-0005, complexityRules, eslintConfig
 
-### Community 8 - "Scalability Mechanics"
+### Community 13 - "Next.js Config"
 Cohesion: 0.50
-Nodes (4): Maintained aggregate counter document, Multi-tenancy (subcollection per tenant), Distributed (sharded) counter, Dashboard (list + summary metrics)
-
-## Ambiguous Edges - Review These
-- `Shared Zod schemas (client + server)` → `httpOnly session cookie`  [AMBIGUOUS]
-  docs/decisions/0013-data-fetching-and-forms.md · relation: references
+Nodes (3): ADR-0014, nextConfig, withNextIntl
 
 ## Knowledge Gaps
-- **44 isolated node(s):** `Features Index`, `Firebase Local Emulator Suite`, `Documentation Index`, `Plans Index`, `graphify post-commit hook` (+39 more)
+- **76 isolated node(s):** `RouteContext`, `geistSans`, `geistMono`, `metadata`, `Mode` (+71 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **What is the exact relationship between `Shared Zod schemas (client + server)` and `httpOnly session cookie`?**
-  _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
-- **Why does `ADR index and process` connect `Architecture & Conventions` to `Security & Scalability Posture`, `AI Feature (proposed)`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **Why does `Core beliefs` connect `i18n & Core Beliefs` to `Testing & Observability`, `Frontend Stack & Components`, `Code Quality & Tooling`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
-- **Why does `Build sequence (Phases 0–8)` connect `Testing & Observability` to `Frontend Stack & Components`?**
-  _High betweenness centrality (0.042) - this node is a cross-community bridge._
-- **What connects `Price as Integer Cents`, `Composite Index Strategy`, `Cursor Pagination` to the rest of the system?**
-  _49 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Architecture & Conventions` be split into smaller, more focused modules?**
-  _Cohesion score 0.10666666666666667 - nodes in this community are weakly interconnected._
-- **Should `Roles, Auth & Firestore Schema` be split into smaller, more focused modules?**
-  _Cohesion score 0.1067193675889328 - nodes in this community are weakly interconnected._
+- **Why does `UI Components & Frontend Design` connect `Frontend Stack & Design` to `Auth Model & Firestore Schema`?**
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+- **Why does `Tailwind CSS` connect `Frontend Stack & Design` to `Architecture & Core Beliefs`?**
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Why does `Design Docs Index` connect `Auth Model & Firestore Schema` to `Frontend Stack & Design`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+- **What connects `RouteContext`, `geistSans`, `geistMono` to the rest of the system?**
+  _77 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Product UI Components` be split into smaller, more focused modules?**
+  _Cohesion score 0.08865248226950355 - nodes in this community are weakly interconnected._
+- **Should `Auth Model & Firestore Schema` be split into smaller, more focused modules?**
+  _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._
+- **Should `Architecture & Core Beliefs` be split into smaller, more focused modules?**
+  _Cohesion score 0.07610993657505286 - nodes in this community are weakly interconnected._
