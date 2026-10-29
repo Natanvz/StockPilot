@@ -14,6 +14,9 @@ export type { Product };
 
 const COLLECTION = 'products';
 
+/** Default list page size — intentionally small so pagination is easy to see/demo. */
+export const DEFAULT_PAGE_SIZE = 5;
+
 function isoOrNull(value: unknown): string | null {
   return value ? (value as Timestamp).toDate().toISOString() : null;
 }
@@ -46,7 +49,7 @@ export const productRepository = {
   async list(
     options: { limit?: number; cursor?: ProductCursor | null } = {},
   ): Promise<ProductPage> {
-    const limit = options.limit ?? 20;
+    const limit = options.limit ?? DEFAULT_PAGE_SIZE;
     let query = getAdminDb()
       .collection(COLLECTION)
       .orderBy('createdAt', 'desc')

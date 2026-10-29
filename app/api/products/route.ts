@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { toErrorResponse } from '@/lib/api/respond';
 import { requireRole, requireUser } from '@/lib/auth/guards';
-import { productRepository } from '@/lib/data/product-repository';
+import { DEFAULT_PAGE_SIZE, productRepository } from '@/lib/data/product-repository';
 import { createProductSchema } from '@/lib/validation/product';
 
 /** List products, one cursor page at a time (any authenticated user). */
@@ -9,7 +9,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   try {
     await requireUser();
     const params = new URL(request.url).searchParams;
-    const limit = Math.min(Number(params.get('limit')) || 20, 100);
+    const limit = Math.min(Number(params.get('limit')) || DEFAULT_PAGE_SIZE, 100);
     const cursorCreatedAt = params.get('cursorCreatedAt');
     const cursorId = params.get('cursorId');
     const cursor =
