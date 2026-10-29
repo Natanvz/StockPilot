@@ -35,16 +35,19 @@ function toDefaults(product: Product | null): FormValues {
   };
 }
 
+/** What the form is doing — create, or edit a specific product. */
+export type FormTarget = { mode: 'create' } | { mode: 'edit'; product: Product };
+
 // eslint-disable-next-line max-lines-per-function -- one cohesive form; splitting the fields would scatter it
 export function ProductFormDialog({
   target,
   onClose,
 }: {
-  target: Product | 'new';
+  target: FormTarget;
   onClose: () => void;
 }) {
   const t = useTranslations('dashboard');
-  const product = target === 'new' ? null : target;
+  const product = target.mode === 'edit' ? target.product : null;
   const create = useCreateProduct();
   const update = useUpdateProduct();
   const {

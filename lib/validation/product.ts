@@ -3,6 +3,12 @@ import { z } from 'zod';
 export const PRODUCT_STATUSES = ['active', 'inactive'] as const;
 export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
 
+/** Named status values, to avoid bare 'active'/'inactive' literals in logic. */
+export const STATUS = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+} as const satisfies Record<string, ProductStatus>;
+
 /**
  * Product input schema (ADR 0013 — one schema validates the client form and the
  * server request body). `price` is an integer in cents (database-schema.md).

@@ -5,9 +5,18 @@ import {
   FieldValue,
   Timestamp,
   type DocumentData,
+  type Query,
 } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase/admin';
-import type { Product, ProductCursor, ProductPage, ProductStats } from '@/lib/types/product';
+import type {
+  Product,
+  ProductCursor,
+  ProductPage,
+  ProductStats,
+  SortKey,
+  StatusFilter,
+} from '@/lib/types/product';
+import { STATUS } from '@/lib/validation/product';
 import type { CreateProductInput, UpdateProductInput } from '@/lib/validation/product';
 
 export type { Product };
@@ -16,6 +25,36 @@ const COLLECTION = 'products';
 
 /** Default list page size — intentionally small so pagination is easy to see/demo. */
 export const DEFAULT_PAGE_SIZE = 5;
+
+/** Each sort maps to a Firestore field + direction (ADR 0015). */
+const SORTS: Record<SortKey, { field: 'createdAt' | 'name' | 'price'; direction: 'asc' | 'desc' }> =
+  {
+    newest: { field: 'createdAt', direction: 'desc' },
+    name: { field: 'name', direction: 'asc' },
+    priceLow: { field: 'price', direction: 'asc' },
+    priceHigh: { field: 'price', direction: 'desc' },
+  };
+
+/** The cursor value = the sort field's value on the last item of the page. */
+function cursorValueFor(sort: SortKey, product: Product): string | number {
+  const { field } = SORTS[sort];
+  if (field === 'name') return product.name;
+  if (field === 'price') return product.price;
+  return product.createdAt ?? '';
+}
+
+/** Convert a cursor value back to the type `startAfter` expects for this sort. */
+function startAfterValue(sort: SortKey, value: string | number): string | number | Timestamp {
+  const { field } = SORTS[sort];
+  if (field === 'name') return String(value);
+  if (field === 'price') return Number(value);
+  return Timestamp.fromDate(new Date(String(value)));
+}
+
+/** Apply the status filter to a query (no-op for `all`). */
+function withStatus(query: Query, status: StatusFilter | undefined): Query {
+  return status && status !== 'all' ? query.where('status', '==', status) : query;
+}
 
 function isoOrNull(value: unknown): string | null {
   return value ? (value as Timestamp).toDate().toISOString() : null;
@@ -42,34 +81,42 @@ export function toProduct(id: string, data: DocumentData): Product {
  */
 export const productRepository = {
   /**
-   * One page of products, newest first, via cursor pagination (ADR 0006):
-   * `startAfter` on (createdAt, documentId) keeps paging cost flat regardless of
-   * how deep you are — never numeric offsets. `nextCursor` is null on the last page.
+   * One page of products, filtered + sorted server-side, via cursor pagination
+   * (ADR 0015): `startAfter` on (sort field, documentId) keeps paging cost flat —
+   * never numeric offsets. `nextCursor` is null on the last page.
    */
   async list(
-    options: { limit?: number; cursor?: ProductCursor | null } = {},
+    options: {
+      limit?: number;
+      cursor?: ProductCursor | null;
+      status?: StatusFilter;
+      sort?: SortKey;
+    } = {},
   ): Promise<ProductPage> {
     const limit = options.limit ?? DEFAULT_PAGE_SIZE;
-    let query = getAdminDb()
-      .collection(COLLECTION)
-      .orderBy('createdAt', 'desc')
-      .orderBy(FieldPath.documentId());
+    const sort = options.sort ?? 'newest';
+    const { field, direction } = SORTS[sort];
 
+    let query = withStatus(getAdminDb().collection(COLLECTION), options.status)
+      .orderBy(field, direction)
+      .orderBy(FieldPath.documentId());
     if (options.cursor) {
-      query = query.startAfter(
-        Timestamp.fromDate(new Date(options.cursor.createdAt)),
-        options.cursor.id,
-      );
+      query = query.startAfter(startAfterValue(sort, options.cursor.value), options.cursor.id);
     }
 
     const snapshot = await query.limit(limit).get();
     const products = snapshot.docs.map((doc) => toProduct(doc.id, doc.data()));
-    const last = snapshot.docs.at(-1);
+    const last = products.at(-1);
     const nextCursor =
-      snapshot.docs.length === limit && last
-        ? { createdAt: toProduct(last.id, last.data()).createdAt ?? '', id: last.id }
-        : null;
+      products.length === limit && last ? { value: cursorValueFor(sort, last), id: last.id } : null;
     return { products, nextCursor };
+  },
+
+  /** Count products matching the status filter (cheap `count()` aggregation). */
+  async count(options: { status?: StatusFilter } = {}): Promise<number> {
+    const query = withStatus(getAdminDb().collection(COLLECTION), options.status);
+    const snapshot = await query.count().get();
+    return snapshot.data().count;
   },
 
   /**
@@ -81,7 +128,7 @@ export const productRepository = {
     const collection = getAdminDb().collection(COLLECTION);
     const totalSnap = await collection.count().get();
     const activeSnap = await collection
-      .where('status', '==', 'active')
+      .where('status', '==', STATUS.ACTIVE)
       .aggregate({ count: AggregateField.count(), value: AggregateField.sum('price') })
       .get();
     return {

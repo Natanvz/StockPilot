@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { toErrorResponse } from '@/lib/api/respond';
 import { requireRole, requireUser } from '@/lib/auth/guards';
+import { ROLE } from '@/lib/auth/roles';
 import { productRepository } from '@/lib/data/product-repository';
 import { updateProductSchema } from '@/lib/validation/product';
 
@@ -24,7 +25,7 @@ export async function GET(_request: Request, { params }: RouteContext): Promise<
 /** Update a product (admin only). */
 export async function PATCH(request: Request, { params }: RouteContext): Promise<NextResponse> {
   try {
-    await requireRole('admin');
+    await requireRole(ROLE.ADMIN);
     const { id } = await params;
     const body: unknown = await request.json().catch(() => null);
     const parsed = updateProductSchema.safeParse(body);
@@ -44,7 +45,7 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
 /** Delete a product (admin only). */
 export async function DELETE(_request: Request, { params }: RouteContext): Promise<NextResponse> {
   try {
-    await requireRole('admin');
+    await requireRole(ROLE.ADMIN);
     const { id } = await params;
     const removed = await productRepository.remove(id);
     return removed ? NextResponse.json({ ok: true }) : notFound();

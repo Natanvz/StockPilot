@@ -1,21 +1,38 @@
 import { NextResponse } from 'next/server';
 import { toErrorResponse } from '@/lib/api/respond';
 import { requireRole, requireUser } from '@/lib/auth/guards';
+import { ROLE } from '@/lib/auth/roles';
 import { DEFAULT_PAGE_SIZE, productRepository } from '@/lib/data/product-repository';
+import type { SortKey, StatusFilter } from '@/lib/types/product';
 import { createProductSchema } from '@/lib/validation/product';
 
-/** List products, one cursor page at a time (any authenticated user). */
+const SORT_KEYS: readonly string[] = ['newest', 'name', 'priceLow', 'priceHigh'];
+
+function parseStatus(value: string | null): StatusFilter {
+  return value === 'active' || value === 'inactive' ? value : 'all';
+}
+
+function parseSort(value: string | null): SortKey {
+  return SORT_KEYS.includes(value ?? '') ? (value as SortKey) : 'newest';
+}
+
+/** List products — one cursor page, filtered + sorted server-side (any user). ADR 0015. */
 export async function GET(request: Request): Promise<NextResponse> {
   try {
     await requireUser();
     const params = new URL(request.url).searchParams;
     const limit = Math.min(Number(params.get('limit')) || DEFAULT_PAGE_SIZE, 100);
-    const cursorCreatedAt = params.get('cursorCreatedAt');
+    const status = parseStatus(params.get('status'));
+    const sort = parseSort(params.get('sort'));
+    const cursorValue = params.get('cursorValue');
     const cursorId = params.get('cursorId');
-    const cursor =
-      cursorCreatedAt && cursorId ? { createdAt: cursorCreatedAt, id: cursorId } : null;
-    const page = await productRepository.list({ limit, cursor });
-    return NextResponse.json(page);
+    const cursor = cursorValue !== null && cursorId ? { value: cursorValue, id: cursorId } : null;
+
+    const [page, total] = await Promise.all([
+      productRepository.list({ limit, cursor, status, sort }),
+      productRepository.count({ status }),
+    ]);
+    return NextResponse.json({ ...page, total });
   } catch (error) {
     return toErrorResponse(error);
   }
@@ -24,7 +41,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 /** Create a product (admin only). */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const user = await requireRole('admin');
+    const user = await requireRole(ROLE.ADMIN);
     const body: unknown = await request.json().catch(() => null);
     const parsed = createProductSchema.safeParse(body);
     if (!parsed.success) {

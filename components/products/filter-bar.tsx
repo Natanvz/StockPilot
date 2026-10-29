@@ -1,9 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-
-export type StatusFilter = 'all' | 'active' | 'inactive';
-export type SortKey = 'newest' | 'name' | 'priceLow' | 'priceHigh';
+import type { SortKey, StatusFilter } from '@/lib/types/product';
 
 type Props = {
   status: StatusFilter;

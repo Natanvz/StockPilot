@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/lib/format';
 import type { Product } from '@/lib/types/product';
+import { STATUS } from '@/lib/validation/product';
 
 type Props = {
   products: Product[];
@@ -48,7 +49,7 @@ export function ProductTable({ products, canManage, onEdit, onDelete }: Props) {
               <td className="text-muted-foreground px-4 py-2">{product.category}</td>
               <td className="px-4 py-2 tabular-nums">{formatPrice(product.price)}</td>
               <td className="px-4 py-2">
-                <Badge tone={product.status === 'active' ? 'success' : 'muted'}>
+                <Badge tone={product.status === STATUS.ACTIVE ? 'success' : 'muted'}>
                   {t(`status_${product.status}`)}
                 </Badge>
               </td>

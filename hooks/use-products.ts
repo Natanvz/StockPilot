@@ -1,20 +1,19 @@
 'use client';
 
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { productsApi } from '@/lib/api/products-client';
-import type { ProductCursor } from '@/lib/types/product';
+import type { ProductListParams } from '@/lib/types/product';
 import type { UpdateProductInput } from '@/lib/validation/product';
 
 const PRODUCTS_KEY = ['products'] as const;
 const STATS_KEY = ['product-stats'] as const;
 
-/** Paginated product list (TanStack infinite query; cursor-based — ADR 0006). */
-export function useProducts() {
-  return useInfiniteQuery({
-    queryKey: PRODUCTS_KEY,
-    queryFn: ({ pageParam }) => productsApi.list(pageParam),
-    initialPageParam: null as ProductCursor | null,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+/** One page of products for the current filter/sort/cursor (ADR 0015). */
+export function useProducts(params: ProductListParams) {
+  return useQuery({
+    queryKey: [...PRODUCTS_KEY, params],
+    queryFn: () => productsApi.list(params),
+    placeholderData: keepPreviousData, // keep the current page visible while the next loads
   });
 }
 

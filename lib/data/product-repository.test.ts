@@ -40,25 +40,25 @@ function makeDb(opts: { listDocs?: FakeDoc[]; getDoc?: FakeDoc } & StatOpts) {
   const addedRef = { get: vi.fn().mockResolvedValue(opts.getDoc) };
   const add = vi.fn().mockResolvedValue(addedRef);
 
-  // list(): collection().orderBy().orderBy().limit()[.startAfter()].get()
+  // list(): [where()].orderBy().orderBy().limit()[.startAfter()].get()
   const listGet = vi.fn().mockResolvedValue({ docs: opts.listDocs ?? [] });
   const limit = vi.fn(() => ({ get: listGet }));
   const startAfter = vi.fn(() => ({ limit }));
   const orderBy2 = vi.fn(() => ({ limit, startAfter }));
   const orderBy1 = vi.fn(() => ({ orderBy: orderBy2 }));
 
-  // getStats(): count().get() and where().aggregate().get()
+  // count(): [where()].count().get(); getStats(): count() + where().aggregate().get()
   const countGet = vi.fn().mockResolvedValue({ data: () => ({ count: opts.total ?? 0 }) });
+  const count = vi.fn(() => ({ get: countGet }));
   const aggGet = vi
     .fn()
     .mockResolvedValue({ data: () => ({ count: opts.activeCount ?? 0, value: opts.activeValue }) });
-  const collection = vi.fn(() => ({
-    doc: vi.fn(() => docRef),
-    add,
-    orderBy: orderBy1,
-    count: vi.fn(() => ({ get: countGet })),
-    where: vi.fn(() => ({ aggregate: vi.fn(() => ({ get: aggGet })) })),
-  }));
+  const aggregate = vi.fn(() => ({ get: aggGet }));
+
+  // where() and the collection both expose orderBy / count / aggregate.
+  const queryable = { orderBy: orderBy1, count, aggregate };
+  const where = vi.fn(() => queryable);
+  const collection = vi.fn(() => ({ ...queryable, where, doc: vi.fn(() => docRef), add }));
   return { db: { collection } as unknown as ReturnType<typeof getAdminDb>, docRef, add };
 }
 
@@ -96,10 +96,23 @@ describe('productRepository.list', () => {
     expect(page.nextCursor).toBeNull();
   });
 
-  it('returns a cursor from the last item when the page is full', async () => {
+  it('returns a cursor (sort value + id) from the last item when the page is full', async () => {
     mockGetAdminDb.mockReturnValue(makeDb({ listDocs: [fakeDoc('p1', docData)] }).db);
-    const page = await productRepository.list({ limit: 1 });
-    expect(page.nextCursor).toEqual({ createdAt: '2026-01-02T03:04:05.000Z', id: 'p1' });
+    const page = await productRepository.list({ limit: 1, sort: 'newest' });
+    expect(page.nextCursor).toEqual({ value: '2026-01-02T03:04:05.000Z', id: 'p1' });
+  });
+
+  it('uses the name as the cursor value when sorting by name', async () => {
+    mockGetAdminDb.mockReturnValue(makeDb({ listDocs: [fakeDoc('p1', docData)] }).db);
+    const page = await productRepository.list({ limit: 1, sort: 'name' });
+    expect(page.nextCursor).toEqual({ value: 'Widget', id: 'p1' });
+  });
+});
+
+describe('productRepository.count', () => {
+  it('returns the count aggregation total', async () => {
+    mockGetAdminDb.mockReturnValue(makeDb({ total: 7 }).db);
+    await expect(productRepository.count({ status: 'active' })).resolves.toBe(7);
   });
 });
 
