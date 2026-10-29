@@ -4,7 +4,8 @@
   },
   "home": {
     "tagline": "A mini SaaS dashboard for managing a product catalog.",
-    "scaffoldNote": "Scaffold is up — features land next."
+    "signIn": "Sign in",
+    "createAccount": "Create an account"
   },
   "theme": {
     "toggle": "Toggle theme",
