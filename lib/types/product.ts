@@ -4,6 +4,9 @@ import type { ProductStatus } from '@/lib/validation/product';
 export type Product = {
   id: string;
   name: string;
+  /** The category this product belongs to (ADR 0016). */
+  categoryId: string;
+  /** Denormalized category name, kept on the product for cheap table display. */
   category: string;
   /** Integer, in cents. */
   price: number;
@@ -32,9 +35,21 @@ export type ProductPage = { products: Product[]; nextCursor: ProductCursor | nul
 /** The list API response: a page plus the total count for the current filter. */
 export type ProductListResult = ProductPage & { total: number };
 
+/**
+ * Category filter for the list: a category id, or the literal `all` for no
+ * category constraint. Real Firestore ids are never the string `all`. A named
+ * alias (not bare `string`) so call sites read as "a category filter".
+ */
+// eslint-disable-next-line sonarjs/redundant-type-aliases -- intentional domain alias for readability
+export type CategoryFilter = string;
+
+/** The sentinel meaning "no category constraint". */
+export const ALL_CATEGORIES = 'all';
+
 /** The query inputs that define a list request. */
 export type ProductListParams = {
   status: StatusFilter;
+  categoryId: CategoryFilter;
   sort: SortKey;
   limit: number;
   cursor: ProductCursor | null;

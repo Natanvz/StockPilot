@@ -18,8 +18,14 @@ async function parse<T>(res: Response): Promise<T> {
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
 export const productsApi = {
-  async list({ status, sort, limit, cursor }: ProductListParams): Promise<ProductListResult> {
-    const params = new URLSearchParams({ status, sort, limit: String(limit) });
+  async list({
+    status,
+    categoryId,
+    sort,
+    limit,
+    cursor,
+  }: ProductListParams): Promise<ProductListResult> {
+    const params = new URLSearchParams({ status, categoryId, sort, limit: String(limit) });
     if (cursor) {
       params.set('cursorValue', String(cursor.value));
       params.set('cursorId', cursor.id);

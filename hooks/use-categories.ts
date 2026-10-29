@@ -5,6 +5,7 @@ import { categoriesApi } from '@/lib/api/categories-client';
 import type { UpdateCategoryInput } from '@/lib/validation/category';
 
 const CATEGORIES_KEY = ['categories'] as const;
+const PRODUCTS_KEY = ['products'] as const;
 
 /** The full category list (a small, bounded admin-managed set). */
 export function useCategories() {
@@ -13,7 +14,13 @@ export function useCategories() {
 
 function useInvalidateCategories() {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY });
+  // Also refresh products: a rename updates their denormalized category name, and
+  // any category change alters the filter/select options (ADR 0016).
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY }),
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY }),
+    ]);
 }
 
 export function useCreateCategory() {

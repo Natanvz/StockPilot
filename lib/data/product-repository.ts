@@ -8,18 +8,28 @@ import {
   type Query,
 } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase/admin';
-import type {
-  Product,
-  ProductCursor,
-  ProductPage,
-  ProductStats,
-  SortKey,
-  StatusFilter,
+import {
+  ALL_CATEGORIES,
+  type CategoryFilter,
+  type Product,
+  type ProductCursor,
+  type ProductPage,
+  type ProductStats,
+  type SortKey,
+  type StatusFilter,
 } from '@/lib/types/product';
 import { STATUS } from '@/lib/validation/product';
 import type { CreateProductInput, UpdateProductInput } from '@/lib/validation/product';
 
 export type { Product };
+
+/**
+ * What the repository writes for a product. The client sends a `categoryId`
+ * (validated by the Zod schema); the route resolves the category and passes its
+ * `name` here, so the stored document carries both (ADR 0016 — denormalized name).
+ */
+export type CreateProductData = CreateProductInput & { category: string };
+export type UpdateProductData = UpdateProductInput & { category?: string };
 
 const COLLECTION = 'products';
 
@@ -56,6 +66,21 @@ function withStatus(query: Query, status: StatusFilter | undefined): Query {
   return status && status !== 'all' ? query.where('status', '==', status) : query;
 }
 
+/** Apply the category filter to a query (no-op for `all`/unset). */
+function withCategory(query: Query, categoryId: CategoryFilter | undefined): Query {
+  return categoryId && categoryId !== ALL_CATEGORIES
+    ? query.where('categoryId', '==', categoryId)
+    : query;
+}
+
+/** Apply both equality filters (status, then category). */
+function withFilters(
+  query: Query,
+  filters: { status?: StatusFilter; categoryId?: CategoryFilter },
+): Query {
+  return withCategory(withStatus(query, filters.status), filters.categoryId);
+}
+
 function isoOrNull(value: unknown): string | null {
   return value ? (value as Timestamp).toDate().toISOString() : null;
 }
@@ -65,6 +90,7 @@ export function toProduct(id: string, data: DocumentData): Product {
   return {
     id,
     name: data.name,
+    categoryId: data.categoryId,
     category: data.category,
     price: data.price,
     status: data.status,
@@ -90,6 +116,7 @@ export const productRepository = {
       limit?: number;
       cursor?: ProductCursor | null;
       status?: StatusFilter;
+      categoryId?: CategoryFilter;
       sort?: SortKey;
     } = {},
   ): Promise<ProductPage> {
@@ -97,7 +124,7 @@ export const productRepository = {
     const sort = options.sort ?? 'newest';
     const { field, direction } = SORTS[sort];
 
-    let query = withStatus(getAdminDb().collection(COLLECTION), options.status)
+    let query = withFilters(getAdminDb().collection(COLLECTION), options)
       .orderBy(field, direction)
       .orderBy(FieldPath.documentId());
     if (options.cursor) {
@@ -112,9 +139,11 @@ export const productRepository = {
     return { products, nextCursor };
   },
 
-  /** Count products matching the status filter (cheap `count()` aggregation). */
-  async count(options: { status?: StatusFilter } = {}): Promise<number> {
-    const query = withStatus(getAdminDb().collection(COLLECTION), options.status);
+  /** Count products matching the status + category filters (cheap `count()` aggregation). */
+  async count(
+    options: { status?: StatusFilter; categoryId?: CategoryFilter } = {},
+  ): Promise<number> {
+    const query = withFilters(getAdminDb().collection(COLLECTION), options);
     const snapshot = await query.count().get();
     return snapshot.data().count;
   },
@@ -143,22 +172,22 @@ export const productRepository = {
     return doc.exists ? toProduct(doc.id, doc.data() as DocumentData) : null;
   },
 
-  async create(input: CreateProductInput, ownerId: string): Promise<Product> {
+  async create(data: CreateProductData, ownerId: string): Promise<Product> {
     const now = FieldValue.serverTimestamp();
     const ref = await getAdminDb()
       .collection(COLLECTION)
-      .add({ ...input, ownerId, createdAt: now, updatedAt: now });
+      .add({ ...data, ownerId, createdAt: now, updatedAt: now });
     const doc = await ref.get();
     return toProduct(doc.id, doc.data() as DocumentData);
   },
 
-  async update(id: string, input: UpdateProductInput): Promise<Product | null> {
+  async update(id: string, data: UpdateProductData): Promise<Product | null> {
     const ref = getAdminDb().collection(COLLECTION).doc(id);
     const existing = await ref.get();
     if (!existing.exists) {
       return null;
     }
-    await ref.update({ ...input, updatedAt: FieldValue.serverTimestamp() });
+    await ref.update({ ...data, updatedAt: FieldValue.serverTimestamp() });
     const doc = await ref.get();
     return toProduct(doc.id, doc.data() as DocumentData);
   },
@@ -171,5 +200,32 @@ export const productRepository = {
     }
     await ref.delete();
     return true;
+  },
+
+  /** How many products reference a category — used to block its deletion (ADR 0016). */
+  async countByCategory(categoryId: string): Promise<number> {
+    const snapshot = await getAdminDb()
+      .collection(COLLECTION)
+      .where('categoryId', '==', categoryId)
+      .count()
+      .get();
+    return snapshot.data().count;
+  },
+
+  /**
+   * Refresh the denormalized category `name` on every product in a category after
+   * it is renamed (ADR 0016 — fan-out). Batched into one write; returns the count.
+   */
+  async renameCategory(categoryId: string, name: string): Promise<number> {
+    const db = getAdminDb();
+    const snapshot = await db.collection(COLLECTION).where('categoryId', '==', categoryId).get();
+    if (snapshot.empty) {
+      return 0;
+    }
+    const batch = db.batch();
+    const updatedAt = FieldValue.serverTimestamp();
+    snapshot.docs.forEach((doc) => batch.update(doc.ref, { category: name, updatedAt }));
+    await batch.commit();
+    return snapshot.size;
   },
 };

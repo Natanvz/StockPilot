@@ -12,10 +12,12 @@ export const STATUS = {
 /**
  * Product input schema (ADR 0013 — one schema validates the client form and the
  * server request body). `price` is an integer in cents (database-schema.md).
+ * `categoryId` references a category document (ADR 0016); the server resolves and
+ * stores the category name, so the client never sends it.
  */
 export const createProductSchema = z.object({
   name: z.string().trim().min(1).max(100),
-  category: z.string().trim().min(1).max(60),
+  categoryId: z.string().trim().min(1),
   price: z.number().int().nonnegative(),
   status: z.enum(PRODUCT_STATUSES),
 });

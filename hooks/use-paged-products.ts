@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import { useProducts } from '@/hooks/use-products';
-import type { ProductCursor, SortKey, StatusFilter } from '@/lib/types/product';
+import {
+  ALL_CATEGORIES,
+  type CategoryFilter,
+  type ProductCursor,
+  type SortKey,
+  type StatusFilter,
+} from '@/lib/types/product';
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -13,12 +19,19 @@ const DEFAULT_PAGE_SIZE = 5;
  */
 export function usePagedProducts() {
   const [status, setStatus] = useState<StatusFilter>('all');
+  const [categoryId, setCategoryId] = useState<CategoryFilter>(ALL_CATEGORIES);
   const [sort, setSort] = useState<SortKey>('newest');
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [pageIndex, setPageIndex] = useState(0);
   const [cursors, setCursors] = useState<(ProductCursor | null)[]>([null]);
 
-  const query = useProducts({ status, sort, limit: pageSize, cursor: cursors[pageIndex] ?? null });
+  const query = useProducts({
+    status,
+    categoryId,
+    sort,
+    limit: pageSize,
+    cursor: cursors[pageIndex] ?? null,
+  });
   const total = query.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const nextCursor = query.data?.nextCursor ?? null;
@@ -42,6 +55,7 @@ export function usePagedProducts() {
   return {
     query,
     status,
+    categoryId,
     sort,
     pageSize,
     page: pageIndex + 1,
@@ -50,6 +64,7 @@ export function usePagedProducts() {
     canPrev: pageIndex > 0,
     canNext: pageIndex + 1 < totalPages,
     setStatus: (value: StatusFilter) => reset(() => setStatus(value)),
+    setCategory: (value: CategoryFilter) => reset(() => setCategoryId(value)),
     setSort: (value: SortKey) => reset(() => setSort(value)),
     setPageSize: (value: number) => reset(() => setPageSize(value)),
     goPrev: () => setPageIndex((index) => Math.max(0, index - 1)),

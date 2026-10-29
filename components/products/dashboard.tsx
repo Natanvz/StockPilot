@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { usePagedProducts } from '@/hooks/use-paged-products';
 import { useProducts, useProductStats } from '@/hooks/use-products';
 import { ROLE, type Role } from '@/lib/auth/roles';
-import type { Product, SortKey, StatusFilter } from '@/lib/types/product';
+import type { CategoryFilter, Product, SortKey, StatusFilter } from '@/lib/types/product';
 
 type ProductsQuery = ReturnType<typeof useProducts>;
 
@@ -41,8 +41,10 @@ function ProductResults(props: {
 
 function DashboardToolbar(props: {
   status: StatusFilter;
+  categoryId: CategoryFilter;
   sort: SortKey;
   onStatusChange: (status: StatusFilter) => void;
+  onCategoryChange: (categoryId: CategoryFilter) => void;
   onSortChange: (sort: SortKey) => void;
   canManage: boolean;
   onNew: () => void;
@@ -53,6 +55,8 @@ function DashboardToolbar(props: {
       <FilterBar
         status={props.status}
         onStatusChange={props.onStatusChange}
+        categoryId={props.categoryId}
+        onCategoryChange={props.onCategoryChange}
         sort={props.sort}
         onSortChange={props.onSortChange}
       />
@@ -73,8 +77,10 @@ export function Dashboard({ role }: { role: Role }) {
       <MetricCards stats={stats.data} />
       <DashboardToolbar
         status={paged.status}
+        categoryId={paged.categoryId}
         sort={paged.sort}
         onStatusChange={paged.setStatus}
+        onCategoryChange={paged.setCategory}
         onSortChange={paged.setSort}
         canManage={canManage}
         onNew={() => setFormTarget({ mode: 'create' })}

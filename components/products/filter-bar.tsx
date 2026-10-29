@@ -1,11 +1,19 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import type { SortKey, StatusFilter } from '@/lib/types/product';
+import { useCategories } from '@/hooks/use-categories';
+import {
+  ALL_CATEGORIES,
+  type CategoryFilter,
+  type SortKey,
+  type StatusFilter,
+} from '@/lib/types/product';
 
 type Props = {
   status: StatusFilter;
   onStatusChange: (status: StatusFilter) => void;
+  categoryId: CategoryFilter;
+  onCategoryChange: (categoryId: CategoryFilter) => void;
   sort: SortKey;
   onSortChange: (sort: SortKey) => void;
 };
@@ -13,8 +21,16 @@ type Props = {
 const selectClass =
   'border-input bg-background focus-visible:ring-ring h-9 cursor-pointer rounded-md border px-2 text-sm focus-visible:ring-2 focus-visible:outline-none';
 
-export function FilterBar({ status, onStatusChange, sort, onSortChange }: Props) {
+export function FilterBar({
+  status,
+  onStatusChange,
+  categoryId,
+  onCategoryChange,
+  sort,
+  onSortChange,
+}: Props) {
   const t = useTranslations('dashboard');
+  const categories = useCategories();
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -28,6 +44,22 @@ export function FilterBar({ status, onStatusChange, sort, onSortChange }: Props)
           <option value="all">{t('filterAll')}</option>
           <option value="active">{t('status_active')}</option>
           <option value="inactive">{t('status_inactive')}</option>
+        </select>
+      </label>
+
+      <label className="flex items-center gap-2 text-sm">
+        <span className="text-muted-foreground">{t('filterCategory')}</span>
+        <select
+          className={selectClass}
+          value={categoryId}
+          onChange={(event) => onCategoryChange(event.target.value)}
+        >
+          <option value={ALL_CATEGORIES}>{t('filterAll')}</option>
+          {(categories.data ?? []).map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
         </select>
       </label>
 

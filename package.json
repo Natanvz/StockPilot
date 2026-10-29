@@ -18,6 +18,7 @@
     "emulators:reset": "node scripts/reset-emulator-data.mjs && npm run emulators",
     "seed:users": "node --env-file-if-exists=.env.local scripts/seed-users.mjs",
     "seed:admin": "node --env-file-if-exists=.env.local scripts/seed-admin.mjs",
+    "migrate:categories": "node --env-file-if-exists=.env.local scripts/backfill-categories.mjs",
     "prepare": "husky"
   },
   "lint-staged": {

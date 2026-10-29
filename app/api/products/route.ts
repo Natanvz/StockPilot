@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { toErrorResponse } from '@/lib/api/respond';
 import { requireRole, requireUser } from '@/lib/auth/guards';
 import { ROLE } from '@/lib/auth/roles';
+import { categoryRepository } from '@/lib/data/category-repository';
 import { DEFAULT_PAGE_SIZE, productRepository } from '@/lib/data/product-repository';
-import type { SortKey, StatusFilter } from '@/lib/types/product';
+import { ALL_CATEGORIES, type SortKey, type StatusFilter } from '@/lib/types/product';
 import { createProductSchema } from '@/lib/validation/product';
 
 const SORT_KEYS: readonly string[] = ['newest', 'name', 'priceLow', 'priceHigh'];
@@ -23,14 +24,15 @@ export async function GET(request: Request): Promise<NextResponse> {
     const params = new URL(request.url).searchParams;
     const limit = Math.min(Number(params.get('limit')) || DEFAULT_PAGE_SIZE, 100);
     const status = parseStatus(params.get('status'));
+    const categoryId = params.get('categoryId') ?? ALL_CATEGORIES;
     const sort = parseSort(params.get('sort'));
     const cursorValue = params.get('cursorValue');
     const cursorId = params.get('cursorId');
     const cursor = cursorValue !== null && cursorId ? { value: cursorValue, id: cursorId } : null;
 
     const [page, total] = await Promise.all([
-      productRepository.list({ limit, cursor, status, sort }),
-      productRepository.count({ status }),
+      productRepository.list({ limit, cursor, status, categoryId, sort }),
+      productRepository.count({ status, categoryId }),
     ]);
     return NextResponse.json({ ...page, total });
   } catch (error) {
@@ -50,7 +52,14 @@ export async function POST(request: Request): Promise<NextResponse> {
         { status: 400 },
       );
     }
-    const product = await productRepository.create(parsed.data, user.uid);
+    const category = await categoryRepository.getById(parsed.data.categoryId);
+    if (!category) {
+      return NextResponse.json({ error: 'Unknown category' }, { status: 400 });
+    }
+    const product = await productRepository.create(
+      { ...parsed.data, category: category.name },
+      user.uid,
+    );
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
     return toErrorResponse(error);

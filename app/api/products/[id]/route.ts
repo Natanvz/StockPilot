@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { toErrorResponse } from '@/lib/api/respond';
 import { requireRole, requireUser } from '@/lib/auth/guards';
 import { ROLE } from '@/lib/auth/roles';
-import { productRepository } from '@/lib/data/product-repository';
+import { categoryRepository } from '@/lib/data/category-repository';
+import { productRepository, type UpdateProductData } from '@/lib/data/product-repository';
 import { updateProductSchema } from '@/lib/validation/product';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -35,7 +36,16 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
         { status: 400 },
       );
     }
-    const product = await productRepository.update(id, parsed.data);
+    const data: UpdateProductData = { ...parsed.data };
+    // When the category changes, resolve + store its denormalized name (ADR 0016).
+    if (parsed.data.categoryId) {
+      const category = await categoryRepository.getById(parsed.data.categoryId);
+      if (!category) {
+        return NextResponse.json({ error: 'Unknown category' }, { status: 400 });
+      }
+      data.category = category.name;
+    }
+    const product = await productRepository.update(id, data);
     return product ? NextResponse.json({ product }) : notFound();
   } catch (error) {
     return toErrorResponse(error);

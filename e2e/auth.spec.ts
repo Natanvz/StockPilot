@@ -21,7 +21,7 @@ test('a viewer is read-only and is blocked from writing on the server', async ({
 
   // ...and the server rejects a write even with the viewer's own session cookie.
   const response = await page.request.post('/api/products', {
-    data: { name: 'Blocked', category: 'X', price: 100, status: 'active' },
+    data: { name: 'Blocked', categoryId: 'cat-gadgets', price: 100, status: 'active' },
   });
   expect(response.status()).toBe(403);
 });
