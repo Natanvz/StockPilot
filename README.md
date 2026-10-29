@@ -26,7 +26,6 @@ for the build plan and [docs/decisions/](docs/decisions/) for why each call was 
 
 ```bash
 npm install
-cp .env.example .env.local
 
 # Start the Firebase emulators (Auth + Firestore). Needs Java on your PATH.
 # Data persists in ./.firebase-data, so it survives restarts.
@@ -35,7 +34,7 @@ npm run emulators
 # In a second terminal: create demo accounts (one admin, one viewer) — run once.
 npm run seed:users
 
-# In a second terminal: start the app
+# In a second terminal: start the app (auto-targets the emulator, no config needed)
 npm run dev        # → http://localhost:3000
 ```
 

@@ -18,20 +18,20 @@ runs against the Firebase Local Emulator Suite, and the emulator **persists data
 # 1. Install
 npm install
 
-# 2. Copy the env template; the emulator defaults work as-is for local dev
-cp .env.example .env.local
-
-# 3. Start the Auth + Firestore emulators (Auth :9099, Firestore :8080, UI :4000).
+# 2. Start the Auth + Firestore emulators (Auth :9099, Firestore :8080, UI :4000).
 #    Data is imported from / exported to ./.firebase-data, so it survives restarts.
 npm run emulators
 
-# 4. One time: create the demo accounts (see below). In a second terminal:
+# 3. One time: create the demo accounts (see below). In a second terminal:
 npm run seed:users
 
-# 5. In a second terminal, start the app
+# 4. In a second terminal, start the app
 npm run dev
 # → http://localhost:3000
 ```
+
+No env setup needed for local dev: a committed `.env.development` points the app at the emulator
+automatically (see "Environment variables" below).
 
 ## Which account do I sign in with?
 
@@ -68,9 +68,15 @@ starts the normal (persisting) emulators, so you begin empty and new data is sav
 
 ## Environment variables
 
-`.env.example` documents every variable. For emulator-only local dev you can leave the real Firebase
-credentials blank — the client uses a placeholder API key and the Admin SDK auto-detects the emulator
-via `FIREBASE_AUTH_EMULATOR_HOST`. Real values are only needed to deploy.
+Local dev needs **no env setup**. A committed **`.env.development`** holds the emulator defaults
+(`NEXT_PUBLIC_USE_FIREBASE_EMULATOR=1`, the emulator hosts, a throwaway project id) — no secrets, just
+the emulator's standard localhost addresses. Next.js loads it only for `next dev`, never for
+production builds, so real deploys are unaffected.
+
+- To run dev against a **real Firebase project** instead, copy **`.env.example`** → `.env.local` and
+  fill in the real values; `.env.local` overrides `.env.development`.
+- `.env.example` is the template for **deploying** (real client config + Admin SDK service-account
+  credentials). See [deployment.md](deployment.md).
 
 ## Deploying with a real Firebase project
 
