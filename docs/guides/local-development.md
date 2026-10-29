@@ -53,15 +53,10 @@ have them sign out and back in.
 ## Start clean (no data)
 
 The emulators persist to `./.firebase-data`, so by default your users and products survive restarts.
-When you want a clean slate:
-
-- **One clean, throwaway session** — `npm run emulators:fresh` starts the emulators with **no import
-  and no export**: empty on start, and nothing is saved on exit.
-- **Wipe the saved data, then keep persisting** — `npm run emulators:reset` deletes `./.firebase-data`
-  and starts the normal (persisting) emulators, so you begin empty and new data is saved from there.
-
-Either way, re-run `npm run seed:users` afterward if you want the demo accounts back. (You can also
-just delete the `./.firebase-data` folder by hand — it's gitignored.)
+To start from a clean slate, run **`npm run emulators:reset`** — it deletes `./.firebase-data` and
+starts the normal (persisting) emulators, so you begin empty and new data is saved from there. Re-run
+`npm run seed:users` afterward if you want the demo accounts back. (You can also just delete the
+`./.firebase-data` folder by hand — it's gitignored.)
 
 ## Testing
 

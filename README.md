@@ -47,9 +47,9 @@ npm run dev        # → http://localhost:3000
 | viewer (read-only) | `viewer@stockpilot.local` | `password123` |
 
 Or register your own at `/sign-up` (new users are `viewer`); promote anyone with
-`npm run seed:admin -- their@email`. To **start clean with no data**, use
-`npm run emulators:fresh` (throwaway) or `npm run emulators:reset` (wipe the saved data), then
-`seed:users` again. You do **not** need a real Firebase project to run locally. To
+`npm run seed:admin -- their@email`. To **start clean with no data**, run
+`npm run emulators:reset` (wipes the saved data), then `seed:users` again. You do **not** need a real
+Firebase project to run locally. To
 deploy, create a free one and fill `.env.local` from `.env.example` — see the
 [deployment guide](docs/guides/deployment.md).
 
