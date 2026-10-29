@@ -1,8 +1,10 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import { Dashboard } from '@/components/products/dashboard';
 import { Badge } from '@/components/ui/badge';
+import { ROLE } from '@/lib/auth/roles';
 import { getSessionUser } from '@/lib/auth/session';
 
 export default async function DashboardPage() {
@@ -24,6 +26,11 @@ export default async function DashboardPage() {
           <p className="text-muted-foreground hidden text-sm sm:block">
             {t('signedInAs', { email: user.email ?? user.uid })}
           </p>
+          {user.role === ROLE.ADMIN ? (
+            <Link href="/categories" className="text-sm font-medium hover:underline">
+              {t('manageCategories')}
+            </Link>
+          ) : null}
           <SignOutButton />
         </div>
       </div>

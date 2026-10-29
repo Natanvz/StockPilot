@@ -30,6 +30,7 @@
   "dashboard": {
     "title": "Dashboard",
     "signedInAs": "Signed in as {email}",
+    "manageCategories": "Manage categories",
     "loading": "Loading products…",
     "error": "Could not load products. Try again.",
     "empty": "No products yet.",
@@ -65,5 +66,25 @@
     "save": "Save",
     "deleteTitle": "Delete product",
     "deleteConfirm": "Delete \"{name}\"? This cannot be undone."
+  },
+  "categories": {
+    "title": "Categories",
+    "backToDashboard": "← Back to dashboard",
+    "loading": "Loading categories…",
+    "error": "Could not load categories. Try again.",
+    "empty": "No categories yet. Create one to get started.",
+    "colName": "Name",
+    "colActions": "Actions",
+    "newCategory": "New category",
+    "editCategory": "Edit category",
+    "fieldRequired": "This field is required.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteTitle": "Delete category",
+    "deleteConfirm": "Delete \"{name}\"? This cannot be undone.",
+    "deleteInUse": "This category is used by one or more products. Reassign or remove those products first.",
+    "deleteError": "Could not delete the category. Try again."
   }
 }

@@ -3,6 +3,9 @@ import type { CreateCategoryInput, UpdateCategoryInput } from '@/lib/validation/
 
 /** Thin typed client over the categories REST API (ADR 0016). Components call this, not raw fetch. */
 
+/** Thrown by `remove` when the server blocks the delete because products still use it (409). */
+export const CATEGORY_IN_USE = 'CATEGORY_IN_USE';
+
 async function parse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     throw new Error(`Request failed (${res.status})`);
@@ -41,6 +44,10 @@ export const categoriesApi = {
   },
 
   async remove(id: string): Promise<void> {
-    await parse<{ ok: true }>(await fetch(`/api/categories/${id}`, { method: 'DELETE' }));
+    const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+    if (res.status === 409) {
+      throw new Error(CATEGORY_IN_USE);
+    }
+    await parse<{ ok: true }>(res);
   },
 };
