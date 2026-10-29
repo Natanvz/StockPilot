@@ -13,7 +13,7 @@ type Props = {
 };
 
 const selectClass =
-  'border-input bg-background focus-visible:ring-ring h-9 rounded-md border px-2 text-sm focus-visible:ring-2 focus-visible:outline-none';
+  'border-input bg-background focus-visible:ring-ring h-9 cursor-pointer rounded-md border px-2 text-sm focus-visible:ring-2 focus-visible:outline-none';
 
 export function FilterBar({ status, onStatusChange, sort, onSortChange }: Props) {
   const t = useTranslations('dashboard');

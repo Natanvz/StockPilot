@@ -21,7 +21,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const selectClass =
-  'border-input bg-background h-10 w-full rounded-md border px-3 text-sm focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none';
+  'border-input bg-background h-10 w-full cursor-pointer rounded-md border px-3 text-sm focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none';
 
 function toDefaults(product: Product | null): FormValues {
   if (!product) {
