@@ -58,3 +58,6 @@ Update both together in the same commit whenever a status changes.
 | [0012](0012-internationalization.md)                             | Internationalization (next-intl, structured from day one)               | Accepted |
 | [0013](0013-data-fetching-and-forms.md)                          | Data fetching & forms (TanStack Query + react-hook-form + shared Zod)   | Accepted |
 | [0014](0014-disable-cachecomponents.md)                          | Disable Next.js `cacheComponents`                                       | Accepted |
+| [0015](0015-server-side-product-list-and-pager.md)               | Server-side product list (filter + sort + count) and a cursor pager     | Accepted |
+| [0016](0016-categories-as-a-collection.md)                       | Categories as a Firestore collection with admin CRUD                    | Proposed |
+| [0017](0017-deploy-to-vercel.md)                                 | Deploy to Vercel; deploy Firestore rules/indexes via CI                 | Proposed |
