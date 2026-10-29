@@ -1,7 +1,12 @@
 # 0017 — Deploy to Vercel; deploy Firestore rules/indexes via CI
 
 **Date**: 2026-10-29
-**Status**: Proposed
+**Status**: Rejected (2026-10-29) — deployment is out of scope for this project
+
+> **Why rejected.** CD (continuous deployment) was always a deliberate add-on, not a brief
+> requirement — CI already covers the bonus. The owner chose not to pursue a live deploy, so we are
+> not standing up a Vercel project, a real Firebase project, or deploy secrets. The design below is
+> kept for the record; if deployment is revisited, start from here (likely as a new ADR).
 
 ## Context
 

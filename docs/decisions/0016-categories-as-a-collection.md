@@ -1,7 +1,7 @@
 # 0016 — Categories as a Firestore collection with admin CRUD
 
 **Date**: 2026-10-29
-**Status**: Proposed
+**Status**: Accepted
 
 ## Context
 
@@ -10,7 +10,7 @@ canonical list, invites typos and duplicates ("Tools" vs "tools"), and can't bac
 category filter. The product is also moving to server-side filtering (ADR 0015), which wants a real,
 queryable category value.
 
-## Decision (proposed)
+## Decision
 
 - Add a **`categories/{categoryId}`** collection: `{ name, ownerId, createdAt, updatedAt }`, with a
   `categoryRepository`, a Zod schema, and REST routes (`/api/categories`, `/api/categories/[id]`) —
@@ -25,11 +25,26 @@ queryable category value.
 - **Migration**: a one-off backfill creates categories from the distinct existing `category` strings
   and sets each product's `categoryId`.
 
+## Resolved at implementation
+
+The two questions this ADR left open are now decided:
+
+- **Rename → fan-out.** A product keeps a denormalized `category` name for cheap table display. On
+  rename we update that name on every product with the matching `categoryId` (a batched write), rather
+  than resolving the name on every read. The product route orchestrates this; each repository still
+  writes only its own collection (`categoryRepository.update` then `productRepository.renameCategory`).
+- **Delete → block.** Deleting a category that any product references returns **409 Conflict**. We do
+  not silently reassign or orphan products; the admin reassigns or removes those products first. The
+  route checks `productRepository.countByCategory(id)` before deleting.
+
+The write path is server-authoritative: the client sends only `categoryId`; the server looks up the
+category, rejects an unknown id (400), and stores both `categoryId` and the resolved `category` name.
+
 ## Consequences
 
 - Categories become manageable, validated, and filterable server-side.
-- Renames need either denormalized-name refresh (a small fan-out update) or resolve-on-read; we start
-  with denormalized name + an update on rename.
+- Renames cost a small fan-out write; deletes are safe (blocked while referenced).
 - Adds a collection + routes + a small admin screen; justified by the data-quality and filtering win.
-- Deleting a category that products reference needs a rule (block, or reassign to "Uncategorized") —
-  decided at implementation.
+- Combining a category filter with the status filter + sort needs extra composite indexes
+  (`categoryId` + sort field, and `status` + `categoryId` + sort field) — added to
+  `firestore.indexes.json`.

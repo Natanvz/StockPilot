@@ -1,15 +1,18 @@
-# Implementation plan — Server-side pager, categories collection, string cleanup, deploy
+# Implementation plan — Server-side pager, categories collection, string cleanup
 
 **Status**: Active
 **Date**: 2026-10-29
 **Related ADRs**: [0015](../decisions/0015-server-side-product-list-and-pager.md),
-[0016](../decisions/0016-categories-as-a-collection.md),
-[0017](../decisions/0017-deploy-to-vercel.md); evolves [0006](../decisions/0006-scalability-posture.md),
+[0016](../decisions/0016-categories-as-a-collection.md); evolves
+[0006](../decisions/0006-scalability-posture.md),
 [0013](../decisions/0013-data-fetching-and-forms.md).
 
-A second plan covering four pieces of follow-up work. Parts are ordered; each is a reviewable unit.
+Follow-up work in ordered, reviewable parts.
 
-## Part 1 — Code-constant cleanup (ADR 0013 follow-up) ✅ do now
+**Progress**: Part 1 ✅ done · Part 2 ✅ done (commit `7fd8e86`) · Part 3 🔨 in progress ·
+Part 4 ❌ dropped (deployment out of scope — [ADR 0017](../decisions/0017-deploy-to-vercel.md) Rejected).
+
+## Part 1 — Code-constant cleanup (ADR 0013 follow-up) ✅ done
 
 Replace magic string literals used in _logic_ (not UI copy — that's already i18n) with named
 constants, and fix the one real smell: the `'new'` form-mode sentinel.
@@ -22,7 +25,7 @@ constants, and fix the one real smell: the `'new'` form-mode sentinel.
 - **Ships when**: no bare role/status literals remain in logic; the form state is a typed union;
   lint, tsc, and tests pass.
 
-## Part 2 — Server-side list querying + classic pager (ADR 0015)
+## Part 2 — Server-side list querying + classic pager (ADR 0015) ✅ done
 
 Move **status filter + sort to Firestore**, add a **count**, and replace "Load more" with a pager.
 
@@ -43,39 +46,39 @@ Move **status filter + sort to Firestore**, add a **count**, and replace "Load m
 - **Ships when**: paging works Prev/Next with accurate "Page X of Y · N items"; status filter + sort
   run server-side; page-size select works; lint/tsc/unit/e2e/build green.
 
-## Part 3 — Categories as a collection (ADR 0016)
+## Part 3 — Categories as a collection (ADR 0016) 🔨 in progress
 
 Promote `category` from a free-text string on the product to its own collection with admin CRUD.
+Built in three green sub-commits:
 
-- New `categories/{categoryId}` collection: `{ name, createdAt, updatedAt }` (+ `ownerId`).
-- `categoryRepository` (list/get/create/update/remove) + Zod schema; REST routes
+**3a — Categories backend.**
+
+- New `categories/{categoryId}` collection: `{ name, ownerId, createdAt, updatedAt }`.
+- `categoryRepository` (list/getById/create/update/remove) + Zod schema; REST routes
   (`/api/categories`, `/api/categories/[id]`) with `requireUser` (read) / `requireRole('admin')`
-  (write), mirroring products.
-- Product form: category becomes a **select** sourced from the categories list; the product stores a
-  `categoryId` (keep `category` name denormalized for display, or resolve on read).
-- A small **admin categories screen** (list + create/edit/delete), linked from the dashboard for
-  admins only.
-- Dashboard gains a server-side **category filter** (replaces the removed search as the narrowing
-  control).
-- Migration note: existing products have a free-text `category`; document a one-off backfill
-  (create categories from distinct names, set `categoryId`).
+  (write), mirroring products. Client + `use-categories` hooks. Repo unit tests (incl. deny branches).
+
+**3b — Admin categories screen.**
+
+- A small admin screen (list + create / edit / delete), linked from the dashboard for admins only
+  (`app/(dashboard)/categories`). Viewers never see the link; the server still enforces.
+
+**3c — Product ↔ category integration.**
+
+- Product stores `categoryId` **plus** a denormalized `category` name (ADR 0016 — resolved). The
+  product form's category field becomes a **select** sourced from the categories list; the client
+  sends only `categoryId`, the server resolves + stores the name.
+- **Rename fan-out**: `productRepository.renameCategory(id, name)` updates the denormalized name on
+  referencing products; the category PATCH route calls it after the rename.
+- **Delete block**: the category DELETE route returns 409 when
+  `productRepository.countByCategory(id) > 0`.
+- Dashboard gains a server-side **category filter** (the narrowing control that replaced search).
+- `firestore.indexes.json`: add `categoryId` + sort-field and `status` + `categoryId` + sort-field
+  composite indexes.
+- Backfill script for existing free-text categories; e2e seed creates categories; product repo test
+  - e2e updated for the select.
 - **Ships when**: admins can CRUD categories; the product form picks from them; the dashboard filters
-  by category server-side; tests cover the category repo deny branches.
-
-## Part 4 — Deploy / CD (ADR 0017)
-
-Deploy the app and wire continuous deployment.
-
-- **Vercel** via its native GitHub integration: preview deploy per PR, production deploy on merge to
-  `main`. Set the `NEXT_PUBLIC_FIREBASE_*` + Admin `FIREBASE_*` env vars in Vercel (real Firebase
-  project). `.env.development` keeps local dev on the emulator; production reads Vercel env.
-- **Firestore rules** aren't deployed by Vercel — add a small GitHub Actions step on `main`
-  (`firebase deploy --only firestore:rules,firestore:indexes`) using a `FIREBASE_SERVICE_ACCOUNT`
-  secret, so rules + composite indexes ship with the app.
-- `docs/guides/deployment.md`: finalize the exact steps.
-- **Ships when**: a push to `main` deploys a working live URL; rules + indexes are deployed; CI stays
-  green. (Requires a GitHub repo + Vercel project + Firebase project + secrets — provided by the
-  owner.)
+  by category server-side; delete-while-referenced is blocked; lint/tsc/unit/e2e/build green.
 
 ## Decisions / trade-offs
 
@@ -85,6 +88,7 @@ Deploy the app and wire continuous deployment.
 - **Drop free-text search** for now; reintroduce as a server-side **category filter** (Part 3) and,
   at scale, a search index (`design/scalability.md`).
 - **Categories as a collection** (ADR 0016) vs. a free-text string: enables admin management,
-  validation, and a server-side filter; small migration cost.
-- **Vercel** (ADR 0017) over a hand-rolled Actions deploy: native preview + prod deploys for a
-  Next.js app; Actions only deploys the Firebase rules/indexes.
+  validation, and a server-side filter; small migration cost. Rename fans out to the denormalized
+  product name; delete is blocked while referenced (both resolved in ADR 0016).
+- **Deployment dropped** ([ADR 0017](../decisions/0017-deploy-to-vercel.md) Rejected): CD was a
+  bonus add-on, not a brief requirement, and the owner chose not to pursue a live deploy.
