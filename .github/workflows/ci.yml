@@ -6,6 +6,7 @@ on:
     paths-ignore: ['docs/**', '**/*.md', 'graphify-out/**']
   pull_request:
     paths-ignore: ['docs/**', '**/*.md', 'graphify-out/**']
+  workflow_dispatch: # allow running CI manually from the Actions tab
 
 jobs:
   verify:
