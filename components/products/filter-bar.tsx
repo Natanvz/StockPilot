@@ -16,6 +16,8 @@ type Props = {
   onCategoryChange: (categoryId: CategoryFilter) => void;
   sort: SortKey;
   onSortChange: (sort: SortKey) => void;
+  /** Hidden during search, which is relevance-ranked (ADR 0018). */
+  showSort?: boolean;
 };
 
 const selectClass =
@@ -28,6 +30,7 @@ export function FilterBar({
   onCategoryChange,
   sort,
   onSortChange,
+  showSort = true,
 }: Props) {
   const t = useTranslations('dashboard');
   const categories = useCategories();
@@ -63,19 +66,21 @@ export function FilterBar({
         </select>
       </label>
 
-      <label className="flex items-center gap-2 text-sm">
-        <span className="text-muted-foreground">{t('sortBy')}</span>
-        <select
-          className={selectClass}
-          value={sort}
-          onChange={(event) => onSortChange(event.target.value as SortKey)}
-        >
-          <option value="newest">{t('sortNewest')}</option>
-          <option value="name">{t('sortName')}</option>
-          <option value="priceLow">{t('sortPriceLow')}</option>
-          <option value="priceHigh">{t('sortPriceHigh')}</option>
-        </select>
-      </label>
+      {showSort ? (
+        <label className="flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">{t('sortBy')}</span>
+          <select
+            className={selectClass}
+            value={sort}
+            onChange={(event) => onSortChange(event.target.value as SortKey)}
+          >
+            <option value="newest">{t('sortNewest')}</option>
+            <option value="name">{t('sortName')}</option>
+            <option value="priceLow">{t('sortPriceLow')}</option>
+            <option value="priceHigh">{t('sortPriceHigh')}</option>
+          </select>
+        </label>
+      ) : null}
     </div>
   );
 }

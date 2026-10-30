@@ -1,6 +1,11 @@
 import 'server-only';
 import { Meilisearch } from 'meilisearch';
-import type { CategoryFilter, Product, StatusFilter } from '@/lib/types/product';
+import type {
+  CategoryFilter,
+  Product,
+  ProductSearchResult,
+  StatusFilter,
+} from '@/lib/types/product';
 
 /**
  * Meilisearch product index (ADR 0018). A derived read model — Firestore stays
@@ -22,13 +27,6 @@ export type ProductSearchParams = {
   categoryId?: CategoryFilter;
   page?: number;
   hitsPerPage?: number;
-};
-
-export type ProductSearchResult = {
-  products: Product[];
-  total: number;
-  page: number;
-  totalPages: number;
 };
 
 /** Search is enabled only when a Meilisearch host is configured. */

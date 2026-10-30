@@ -57,3 +57,11 @@ export type ProductListParams = {
 
 /** Catalog-wide metrics for the dashboard. */
 export type ProductStats = { total: number; activeCount: number; activeValueCents: number };
+
+/** One page of full-text search results (Meilisearch, ADR 0018). */
+export type ProductSearchResult = {
+  products: Product[];
+  total: number;
+  page: number;
+  totalPages: number;
+};

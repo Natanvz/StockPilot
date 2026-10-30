@@ -8,13 +8,18 @@ import { MetricCards } from '@/components/products/metric-cards';
 import { Pagination } from '@/components/products/pagination';
 import { ProductFormDialog, type FormTarget } from '@/components/products/product-form-dialog';
 import { ProductTable } from '@/components/products/product-table';
+import { SearchBox } from '@/components/products/search-box';
+import { SearchResults } from '@/components/products/search-results';
 import { Button } from '@/components/ui/button';
 import { usePagedProducts } from '@/hooks/use-paged-products';
+import { usePagedSearch, type PagedSearch } from '@/hooks/use-paged-search';
 import { useProducts, useProductStats } from '@/hooks/use-products';
 import { ROLE, type Role } from '@/lib/auth/roles';
+import { searchUiEnabled } from '@/lib/search/enabled';
 import type { CategoryFilter, Product, SortKey, StatusFilter } from '@/lib/types/product';
 
 type ProductsQuery = ReturnType<typeof useProducts>;
+type PagedProducts = ReturnType<typeof usePagedProducts>;
 
 function ProductResults(props: {
   query: ProductsQuery;
@@ -46,21 +51,77 @@ function DashboardToolbar(props: {
   onStatusChange: (status: StatusFilter) => void;
   onCategoryChange: (categoryId: CategoryFilter) => void;
   onSortChange: (sort: SortKey) => void;
+  searchEnabled: boolean;
+  query: string;
+  onQueryChange: (query: string) => void;
+  showSort: boolean;
   canManage: boolean;
   onNew: () => void;
 }) {
   const t = useTranslations('dashboard');
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <FilterBar
-        status={props.status}
-        onStatusChange={props.onStatusChange}
-        categoryId={props.categoryId}
-        onCategoryChange={props.onCategoryChange}
-        sort={props.sort}
-        onSortChange={props.onSortChange}
-      />
+      <div className="flex flex-wrap items-center gap-3">
+        <FilterBar
+          status={props.status}
+          onStatusChange={props.onStatusChange}
+          categoryId={props.categoryId}
+          onCategoryChange={props.onCategoryChange}
+          sort={props.sort}
+          onSortChange={props.onSortChange}
+          showSort={props.showSort}
+        />
+        {props.searchEnabled ? (
+          <SearchBox value={props.query} onChange={props.onQueryChange} />
+        ) : null}
+      </div>
       {props.canManage ? <Button onClick={props.onNew}>{t('newProduct')}</Button> : null}
+    </div>
+  );
+}
+
+function ResultsArea(props: {
+  showSearch: boolean;
+  searchFailed: boolean;
+  search: PagedSearch;
+  paged: PagedProducts;
+  canManage: boolean;
+  onEdit: (product: Product) => void;
+  onDelete: (product: Product) => void;
+}) {
+  const t = useTranslations('dashboard');
+  if (props.showSearch) {
+    return (
+      <SearchResults
+        search={props.search}
+        canManage={props.canManage}
+        onEdit={props.onEdit}
+        onDelete={props.onDelete}
+      />
+    );
+  }
+  return (
+    <div className="space-y-6">
+      {props.searchFailed ? (
+        <p className="text-destructive text-sm">{t('searchUnavailable')}</p>
+      ) : null}
+      <ProductResults
+        query={props.paged.query}
+        canManage={props.canManage}
+        onEdit={props.onEdit}
+        onDelete={props.onDelete}
+      />
+      <Pagination
+        page={props.paged.page}
+        totalPages={props.paged.totalPages}
+        total={props.paged.total}
+        pageSize={props.paged.pageSize}
+        canPrev={props.paged.canPrev}
+        canNext={props.paged.canNext}
+        onPrev={props.paged.goPrev}
+        onNext={props.paged.goNext}
+        onPageSizeChange={props.paged.setPageSize}
+      />
     </div>
   );
 }
@@ -70,7 +131,19 @@ export function Dashboard({ role }: { role: Role }) {
   const stats = useProductStats();
   const [formTarget, setFormTarget] = useState<FormTarget | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
+  const [query, setQuery] = useState('');
   const canManage = role === ROLE.ADMIN;
+
+  const searchEnabled = searchUiEnabled();
+  const searching = searchEnabled && query.trim().length > 0;
+  const search = usePagedSearch({
+    query,
+    status: paged.status,
+    categoryId: paged.categoryId,
+    enabled: searching,
+  });
+  const searchFailed = searching && search.result.isError;
+  const showSearch = searching && !searchFailed;
 
   return (
     <div className="space-y-6">
@@ -82,25 +155,21 @@ export function Dashboard({ role }: { role: Role }) {
         onStatusChange={paged.setStatus}
         onCategoryChange={paged.setCategory}
         onSortChange={paged.setSort}
+        searchEnabled={searchEnabled}
+        query={query}
+        onQueryChange={setQuery}
+        showSort={!searching}
         canManage={canManage}
         onNew={() => setFormTarget({ mode: 'create' })}
       />
-      <ProductResults
-        query={paged.query}
+      <ResultsArea
+        showSearch={showSearch}
+        searchFailed={searchFailed}
+        search={search}
+        paged={paged}
         canManage={canManage}
         onEdit={(product) => setFormTarget({ mode: 'edit', product })}
         onDelete={setDeleteTarget}
-      />
-      <Pagination
-        page={paged.page}
-        totalPages={paged.totalPages}
-        total={paged.total}
-        pageSize={paged.pageSize}
-        canPrev={paged.canPrev}
-        canNext={paged.canNext}
-        onPrev={paged.goPrev}
-        onNext={paged.goNext}
-        onPageSizeChange={paged.setPageSize}
       />
       {formTarget ? (
         <ProductFormDialog target={formTarget} onClose={() => setFormTarget(null)} />

@@ -1,10 +1,21 @@
 import type {
+  CategoryFilter,
   Product,
   ProductListParams,
   ProductListResult,
+  ProductSearchResult,
   ProductStats,
+  StatusFilter,
 } from '@/lib/types/product';
 import type { CreateProductInput, UpdateProductInput } from '@/lib/validation/product';
+
+/** The inputs a search request needs (query + the same filters the list uses). */
+export type ProductSearchQuery = {
+  q: string;
+  status: StatusFilter;
+  categoryId: CategoryFilter;
+  page: number;
+};
 
 /** Thin typed client over the products REST API (ADR 0013). Components call this, not raw fetch. */
 
@@ -36,6 +47,11 @@ export const productsApi = {
   async stats(): Promise<ProductStats> {
     const data = await parse<{ stats: ProductStats }>(await fetch('/api/products/stats'));
     return data.stats;
+  },
+
+  async search({ q, status, categoryId, page }: ProductSearchQuery): Promise<ProductSearchResult> {
+    const params = new URLSearchParams({ q, status, categoryId, page: String(page) });
+    return parse<ProductSearchResult>(await fetch(`/api/products/search?${params.toString()}`));
   },
 
   async create(input: CreateProductInput): Promise<Product> {
