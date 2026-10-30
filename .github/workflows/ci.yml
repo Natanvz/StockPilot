@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21 # firebase-tools >= 15 requires JDK 21+ for the Firestore emulator
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Wait for Meilisearch
