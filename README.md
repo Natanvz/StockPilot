@@ -26,10 +26,14 @@ for the build plan and [docs/decisions/](docs/decisions/) for why each call was 
 > Full, exact steps live in [docs/guides/local-development.md](docs/guides/local-development.md).
 > This is the short version.
 
+**Prerequisites:** Node.js **20.9+** (the **22 LTS** in `.nvmrc` is recommended) with npm, and **Java
+JDK 21+** on your `PATH` — the Firestore emulator needs it (`java -version` must print 21+). Docker is
+**not** required (it's optional, only for the search feature).
+
 ```bash
 npm install
 
-# Start the Firebase emulators (Auth + Firestore). Needs Java on your PATH.
+# Start the Firebase emulators (Auth + Firestore). Needs Java 21+ on your PATH.
 # Data persists in ./.firebase-data, so it survives restarts.
 npm run emulators
 
@@ -95,7 +99,7 @@ Restart `npm run dev` after editing `.env.local`. Full detail (and how sync/degr
   (a viewer's write is tested, not assumed): `npm run test`.
 - **End-to-end** (Playwright, against the Firebase emulator) — sign-in + redirect, role-gated UI, the
   **viewer-gets-403** server check, and the admin create/edit/delete loop: `npm run test:e2e`
-  (needs Java + `npx playwright install`).
+  (needs Java 21+ and `npx playwright install chromium`).
 - **CI** (GitHub Actions) runs lint, type-check, unit tests, build, and the e2e suite on every push.
 
 See ADR [0009](docs/decisions/0009-testing-strategy.md) for the testing strategy.

@@ -5,12 +5,15 @@ runs against the Firebase Local Emulator Suite, and the emulator **persists data
 
 ## Prerequisites
 
-- Node.js 22+ and npm.
-- **Java (JDK 11+) on your `PATH`** — the Firestore emulator needs it. (`JAVA_HOME` alone is not
-  always enough; the Firebase CLI calls `java` directly, so make sure `java -version` works in your
-  shell.) The Auth emulator does not need Java.
+- Node.js **20.9+** and npm (the **22 LTS** in `.nvmrc` is recommended; `nvm use` / Volta / fnm pick
+  it up). `engines` in `package.json` declares the floor.
+- **Java JDK 21+ on your `PATH`** — the Firestore emulator needs it (firebase-tools 15 requires Java
+  21 or newer). `JAVA_HOME` alone is not always enough; the Firebase CLI calls `java` directly, so
+  make sure `java -version` prints **21+** in your shell. The Auth emulator does not need Java.
 - The Firebase CLI is a dev dependency (`firebase-tools`), so `npm install` provides it — no global
   install needed.
+- _(Optional)_ Docker **or** the Meilisearch binary — only if you want to try full-text search; see
+  [Full-text search](#full-text-search-optional) below. Not needed to run the app.
 
 ## Steps
 
