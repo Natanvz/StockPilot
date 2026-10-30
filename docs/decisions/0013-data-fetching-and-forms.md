@@ -25,6 +25,21 @@ twice (once on the client, once on the server).
 - **Reusable UX-state components**: `Skeleton`, `EmptyState`, `ErrorState`, and toast notifications
   (`sonner`) so loading/empty/error/success are rendered the same way everywhere.
 
+## Alternatives considered
+
+**Server state — why TanStack Query:**
+
+- **SWR** — rejected: lighter, but a weaker mutation + cache-invalidation story, which a CRUD
+  dashboard (refetch the list after create/edit/delete) leans on heavily.
+- **RTK Query** — rejected: couples data fetching to Redux Toolkit, which we don't otherwise need.
+- **Apollo Client** — rejected: GraphQL-oriented; we expose REST (ADR 0003).
+- **Plain `fetch` + `useEffect`** — rejected: re-implements caching/loading/error/refetch in every
+  component — the repetition this ADR exists to remove.
+- **TanStack Query** — chosen: mature, framework-agnostic, strong caching + mutation/invalidation.
+
+**Forms — why react-hook-form:** chosen over **Formik** (more re-renders, larger) and uncontrolled
+hand-rolled forms (no shared validation API); it pairs cleanly with the shared Zod resolver.
+
 ## Consequences
 
 - The repetitive fetch/loading/error/refetch boilerplate is written once and reused — directly serves
