@@ -54,10 +54,30 @@ Firebase project to run locally. To
 deploy, create a free one and fill `.env.local` from `.env.example` — see the
 [deployment guide](docs/guides/deployment.md).
 
-> **Optional — full-text search.** StockPilot can use [Meilisearch](https://www.meilisearch.com/) for
-> search. It's **off by default and not required to run the app** — and needs **no Docker** (it's a
-> single binary; Docker is just one way to start it). To try it, see
-> [local-development.md → Full-text search](docs/guides/local-development.md#full-text-search-optional).
+### Optionally: enable full-text search
+
+Search runs on [Meilisearch](https://www.meilisearch.com/) ([ADR 0018](docs/decisions/0018-full-text-search-with-meilisearch.md))
+and is **off by default** — everything above works without it, and the search box stays hidden.
+**Docker is not required** (Meilisearch is a single binary). To turn it on:
+
+```bash
+# 1. Start Meilisearch — pick whichever you have. It listens on http://127.0.0.1:7700
+#    and runs keyless in development mode.
+brew install meilisearch && meilisearch                 # macOS (Homebrew)
+winget install Meilisearch.Meilisearch && meilisearch   # Windows (or: scoop install meilisearch)
+curl -L https://install.meilisearch.com | sh && ./meilisearch   # Linux / macOS (script)
+npm run search                                          # or, if you prefer Docker
+
+# 2. Enable it for the app — add these to .env.local:
+#    MEILI_HOST=http://127.0.0.1:7700
+#    NEXT_PUBLIC_SEARCH_ENABLED=1
+
+# 3. Build the search index from the products in the emulator:
+npm run reindex:search
+```
+
+Restart `npm run dev` after editing `.env.local`. Full detail (and how sync/degradation work) is in
+[local-development.md → Full-text search](docs/guides/local-development.md#full-text-search-optional).
 
 ## What's inside
 
