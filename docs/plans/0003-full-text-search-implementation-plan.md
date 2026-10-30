@@ -1,7 +1,9 @@
 # Implementation plan — Full-text product search (Meilisearch)
 
-**Status**: Active
+**Status**: Completed
 **Date**: 2026-10-30
+**Progress**: Part 1 ✅ (`5bb7925`) · Part 2 ✅ (`77e79cc`) · Part 3 ✅ (route unit test, guarded
+search e2e seeded + verified against real Meilisearch, CI service container).
 **Related ADRs**: [0018](../decisions/0018-full-text-search-with-meilisearch.md); revisits
 [0015](../decisions/0015-server-side-product-list-and-pager.md); touches
 [0016](../decisions/0016-categories-as-a-collection.md).

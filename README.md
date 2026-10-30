@@ -18,6 +18,7 @@ for the build plan and [docs/decisions/](docs/decisions/) for why each call was 
   cursor-based pagination with a classic pager (Prev/Next, "Page X of Y", page-size); summary metrics
   (total, active, active catalog value).
 - **Role-based UI** enforced on the server, never just hidden in the client.
+- **Optional full-text search** (Meilisearch) — off by default; the app runs fully without it.
 - Light/dark theming and i18n-ready copy throughout.
 
 ## Run it locally (under 5 minutes)
@@ -91,8 +92,8 @@ ADR [0003](docs/decisions/0003-rest-over-graphql.md)).
 
 **In scope** — the four core areas (auth & authorization, product CRUD, dashboard, database design)
 plus extra features: **role-based UI**, **server-side filtering + cursor pagination**, a
-**categories collection with admin CRUD**, and **CI**. Each in-scope decision is an **Accepted**
-record in [docs/decisions/](docs/decisions/).
+**categories collection with admin CRUD**, **full-text search** (Meilisearch, optional), and **CI**.
+Each in-scope decision is an **Accepted** record in [docs/decisions/](docs/decisions/).
 
 **Out of scope (for now)** — an **AI-powered feature**
 (ADR [0007](docs/decisions/0007-ai-powered-feature.md)) and **observability**
@@ -109,10 +110,8 @@ With another week, in rough priority order:
    product descriptions, with the safe-productionization story already written.
 2. **Observability** (ADR [0008](docs/decisions/0008-observability.md)) — structured logging +
    error tracking.
-3. **Server-side full-text search** via a search index (today the list filters by status and
-   category, not free text — Firestore has no native substring search).
-4. **Maintained aggregate counters** for metrics at write-scale (ADR [0006](docs/decisions/0006-scalability-posture.md)).
-5. A real **multi-tenancy** pass (subcollection-per-tenant).
+3. **Maintained aggregate counters** for metrics at write-scale (ADR [0006](docs/decisions/0006-scalability-posture.md)).
+4. A real **multi-tenancy** pass (subcollection-per-tenant).
 
 ## AI tool usage
 

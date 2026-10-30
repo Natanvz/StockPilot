@@ -24,8 +24,21 @@ jobs:
       - run: npm run build
 
   e2e:
-    name: Playwright e2e (Firebase emulator)
+    name: Playwright e2e (Firebase emulator + Meilisearch)
     runs-on: ubuntu-latest
+    # Run search ON in CI so the search spec (ADR 0018) executes against a real
+    # engine; these also reach the build (NEXT_PUBLIC_), the seed, and next start.
+    env:
+      MEILI_HOST: http://127.0.0.1:7700
+      NEXT_PUBLIC_SEARCH_ENABLED: '1'
+    services:
+      meilisearch:
+        image: getmeili/meilisearch:v1.12
+        ports:
+          - 7700:7700
+        env:
+          MEILI_NO_ANALYTICS: 'true'
+          MEILI_ENV: development
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,6 +51,12 @@ jobs:
           java-version: 17
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Wait for Meilisearch
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:7700/health && break
+            sleep 2
+          done
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: always()

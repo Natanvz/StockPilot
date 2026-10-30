@@ -8,4 +8,4 @@ Parts, and states how each Part is verified.
 | ----------------------------------------------------------- | ---------------------------------------------------------------- | --------- |
 | [0001](0001-foundation-and-docs-implementation-plan.md)     | Foundation, documentation, and the full build sequence           | Completed |
 | [0002](0002-pager-categories-deploy-implementation-plan.md) | Server-side pager, categories collection, string cleanup, deploy | Completed |
-| [0003](0003-full-text-search-implementation-plan.md)        | Full-text product search (Meilisearch)                           | Active    |
+| [0003](0003-full-text-search-implementation-plan.md)        | Full-text product search (Meilisearch)                           | Completed |
