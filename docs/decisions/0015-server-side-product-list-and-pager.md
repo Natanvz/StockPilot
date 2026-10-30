@@ -28,7 +28,8 @@ total }` from `GET /api/products`.
 - **Remove the free-text search box.** It can't be server-side in Firestore without a search index,
   and a client-side search over one page would be misleading next to accurate page counts. The
   narrowing control returns as a **server-side category filter** (ADR 0016); true search is the
-  search-index path in `design/scalability.md`.
+  search-index path in `design/scalability.md`. _(Revisited by ADR
+  [0018](0018-full-text-search-with-meilisearch.md): the search box returns, backed by Meilisearch.)_
 
 ## Consequences
 

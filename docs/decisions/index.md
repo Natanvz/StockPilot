@@ -61,3 +61,4 @@ Update both together in the same commit whenever a status changes.
 | [0015](0015-server-side-product-list-and-pager.md)               | Server-side product list (filter + sort + count) and a cursor pager     | Accepted |
 | [0016](0016-categories-as-a-collection.md)                       | Categories as a Firestore collection with admin CRUD                    | Accepted |
 | [0017](0017-deploy-to-vercel.md)                                 | Deploy to Vercel; deploy Firestore rules/indexes via CI                 | Rejected |
+| [0018](0018-full-text-search-with-meilisearch.md)                | Full-text product search with Meilisearch                               | Accepted |
