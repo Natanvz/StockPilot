@@ -90,16 +90,17 @@ counter write rate, handled by sharding if needed.
 
 ## Search
 
-The list is paged with cursors (server-side), and **search is client-side** over the pages already
-loaded (name/category substring). This is deliberate: Firestore has no native substring search, and
-bolting a prefix query onto the cursor-paged, sorted list would fight the ordering. At catalog scale
-this stays responsive because paging is cheap; when the catalog outgrows "load a few pages," search
-moves to a dedicated search index (Algolia/Typesense, or a lowercased prefix field), queried
-server-side — a swap behind the same `productsApi`/hook surface, not a UI rewrite.
+Firestore has **no native substring/full-text search**, so full-text search runs on a dedicated
+engine — **Meilisearch** (ADR [0018](../decisions/0018-full-text-search-with-meilisearch.md)).
+Firestore stays the source of truth; the Meilisearch index is a **derived read model** kept in sync
+by a best-effort dual-write on each product change, and rebuildable from Firestore with a `reindex`
+script. Search queries hit Meilisearch server-side (with the same status/category filters as the
+list), so cost scales with the engine, not with Firestore reads. Search is **optional** — off by
+default; when it's not configured the app falls back to the cursor-paged list (ADR 0015). At larger
+scale Meilisearch runs as its own horizontally-scalable service, independent of the app and Firestore.
 
 ## What we deliberately defer
 
-- Server-side search (a search index) — client-side over loaded pages for now; see above.
 - The sharded/distributed counter — documented, built only when write rate requires it.
-- A real caching layer for metrics — the counter already makes reads cheap.
+- A real caching layer for metrics — maintained counters (the scale path) already make reads cheap.
 - Full multi-tenancy — single-tenant now; the migration path above is the plan, not today's code.

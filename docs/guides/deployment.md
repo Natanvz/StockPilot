@@ -9,8 +9,9 @@
 docs-only changes):
 
 - **verify** — `npm ci` → lint → type-check → unit tests → `next build`.
-- **e2e** — provisions Java (for the Firestore emulator) + Chromium, then runs the Playwright suite
-  against the emulator and uploads screenshots + the HTML report as artifacts.
+- **e2e** — provisions Java (for the Firestore emulator) + Chromium **and a Meilisearch service
+  container** (so the search spec runs), then runs the Playwright suite against the emulator and
+  uploads screenshots + the HTML report as artifacts.
 
 ## Deploying to Vercel (recommended for Next.js)
 
@@ -28,6 +29,14 @@ docs-only changes):
 
 Also supported via the Firebase web frameworks integration (`firebase experiments:enable webframeworks`
 then `firebase deploy`). Vercel is the lower-friction path; pick one.
+
+## Full-text search in production (optional)
+
+Search ([ADR 0018](../decisions/0018-full-text-search-with-meilisearch.md)) is optional. To enable it
+on a deployed instance: run a **Meilisearch** instance (Meilisearch Cloud or self-hosted), then set
+`MEILI_HOST`, `MEILI_API_KEY`, and `NEXT_PUBLIC_SEARCH_ENABLED=1` in the host's env, and run
+`npm run reindex:search` once (with the Admin SDK + `MEILI_HOST` env) to build the index. Leave
+`MEILI_HOST` unset to deploy without search — the app runs fine and hides the search box.
 
 ## First admin in production
 

@@ -8,12 +8,12 @@ must be trusted lives behind the API; the browser never talks to Firestore direc
 
 StockPilot optimizes for four things. This is our stance on each, with a pointer to the detail.
 
-| Attribute        | Our stance                                                                                                                                           | Detail                                             |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| **Architecture** | One Next.js app, clear layers (UI → REST API → data access layer → Firestore); decisions recorded as ADRs.                                           | this doc · [decisions/](decisions/)                |
-| **Security**     | Server-side auth on every call: Admin-SDK-verified httpOnly session cookie, custom-claim roles, OWASP basics. UI hiding is never the control.        | [design/authorization.md](design/authorization.md) |
-| **Scalability**  | Stateless compute (scales horizontally), cursor pagination, targeted indexes, maintained aggregate counters for metrics, a clear multi-tenancy path. | [design/scalability.md](design/scalability.md)     |
-| **Code quality** | TypeScript strict, ESLint + Prettier, enforced by a pre-commit hook and CI; tests on security-critical paths.                                        | [guides/code-quality.md](guides/code-quality.md)   |
+| Attribute        | Our stance                                                                                                                                                                           | Detail                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| **Architecture** | One Next.js app, clear layers (UI → REST API → data access layer → Firestore); decisions recorded as ADRs.                                                                           | this doc · [decisions/](decisions/)                |
+| **Security**     | Server-side auth on every call: Admin-SDK-verified httpOnly session cookie, custom-claim roles, OWASP basics. UI hiding is never the control.                                        | [design/authorization.md](design/authorization.md) |
+| **Scalability**  | Stateless compute (scales horizontally), cursor pagination, targeted indexes, Firestore aggregation for metrics (maintained counters as the scale path), a clear multi-tenancy path. | [design/scalability.md](design/scalability.md)     |
+| **Code quality** | TypeScript strict, ESLint + Prettier, enforced by a pre-commit hook and CI; tests on security-critical paths.                                                                        | [guides/code-quality.md](guides/code-quality.md)   |
 
 The hard, non-negotiable rules behind these live in [core-beliefs.md](core-beliefs.md).
 
@@ -25,8 +25,11 @@ The hard, non-negotiable rules behind these live in [core-beliefs.md](core-belie
 - **API**: Next.js **Route Handlers** (`app/api/**/route.ts`) — REST, not GraphQL (ADR [0003](decisions/0003-rest-over-graphql.md)).
 - **Auth**: Firebase Authentication. The client signs in and obtains an ID token; the server verifies
   it with the **Firebase Admin SDK** and issues an httpOnly **session cookie** (ADR [0004](decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md)).
-- **Database**: Cloud Firestore. All access goes through a **data access layer** (`ProductRepository`),
-  never from React components (ADR [0002](decisions/0002-tech-stack-nextjs-firebase-firestore.md)).
+- **Database**: Cloud Firestore (`products`, `categories`, `users`). All access goes through a
+  **data access layer** (`productRepository`, `categoryRepository`), never from React components
+  (ADR [0002](decisions/0002-tech-stack-nextjs-firebase-firestore.md)).
+- **Search** (optional): full-text product search via self-hosted **Meilisearch** — a derived index
+  synced from Firestore, off by default (ADR [0018](decisions/0018-full-text-search-with-meilisearch.md)).
 - **Validation**: Zod schemas at every API boundary — one schema is both the runtime check and the
   TypeScript type.
 - **UI**: React + Tailwind CSS with **shadcn/ui** (owned Radix primitives), semantic design tokens
@@ -35,7 +38,9 @@ The hard, non-negotiable rules behind these live in [core-beliefs.md](core-belie
   for forms (ADR [0013](decisions/0013-data-fetching-and-forms.md)).
 - **i18n**: next-intl; all user-facing strings come from `messages/<locale>.json` (ADR [0012](decisions/0012-internationalization.md)).
 - **Local dev**: Firebase Local Emulator Suite (Auth + Firestore) — no cloud project needed to run.
-- **CI/CD**: GitHub Actions — lint, type-check, test on every push (ADR [0005](decisions/0005-code-quality-enforcement.md)).
+- **CI**: GitHub Actions — lint, type-check, unit tests, `next build`, and Playwright e2e on every
+  push (ADR [0005](decisions/0005-code-quality-enforcement.md)). No auto-deploy — see
+  [guides/deployment.md](guides/deployment.md).
 
 ## How a request flows
 
@@ -65,46 +70,51 @@ Authorization is checked on the server for **every** mutating call. The UI also 
 viewer may not use, but that is a convenience, never the enforcement — see
 [design/authorization.md](design/authorization.md).
 
-## Key directories (planned)
+## Key directories
 
 ```
 stockpilot/
   app/                        # Next.js App Router
-    (auth)/
-      sign-in/page.tsx        # frontend — UI pages
-      sign-up/page.tsx
+    (auth)/sign-in, sign-up   # frontend — auth UI pages
     (dashboard)/
-      dashboard/page.tsx
-      layout.tsx
+      dashboard/page.tsx      #   the product dashboard
+      categories/page.tsx     #   admin-only category management
     api/                      # backend — the HTTP layer (REST endpoints)
-      auth/session/route.ts
+      auth/session/route.ts   #   POST (sign in) / DELETE (sign out)
       products/route.ts       #   GET list, POST create
       products/[id]/route.ts  #   GET, PATCH, DELETE one
-    layout.tsx
-  components/                 # frontend — React components (products/, dashboard/, ui/)
-  hooks/                      # frontend — client data-fetching hooks
+      products/search/route.ts#   GET full-text search (Meilisearch)
+      products/stats/route.ts #   GET summary metrics
+      categories/route.ts, categories/[id]/route.ts
+  components/                 # frontend — React (products/, categories/, auth/, ui/)
+  hooks/                      # frontend — client data hooks (use-paged-products, use-paged-search, …)
   lib/                        # backend core — plain TypeScript, no React
     firebase/                 #   client.ts (client SDK), admin.ts (Admin SDK, server only)
-    auth/                     #   session.ts, require-user.ts, require-role.ts
-    data/                     #   product-repository.ts — the ONLY code that touches Firestore
+    auth/                     #   session.ts, guards.ts, roles.ts
+    data/                     #   product-repository.ts, category-repository.ts — the ONLY code that touches Firestore
+    search/                   #   product-index.ts — Meilisearch sync/query (server only) + enabled.ts
     validation/               #   Zod schemas (shared by API and client)
-  styles/
+    api/                      #   typed REST clients used by the hooks
+  messages/                   # i18n JSON (en)
+  scripts/                    # emulator seeds, category backfill, search reindex
   docs/                       # this documentation
 ```
 
-> This is the intended layout; it is kept current as the code lands. The implementation sequence is
-> in [plans/0001-foundation-and-docs-implementation-plan.md](plans/0001-foundation-and-docs-implementation-plan.md).
+> Kept current as the code evolves. The original build sequence is in
+> [plans/0001-foundation-and-docs-implementation-plan.md](plans/0001-foundation-and-docs-implementation-plan.md);
+> later work is plans [0002](plans/0002-pager-categories-deploy-implementation-plan.md) and
+> [0003](plans/0003-full-text-search-implementation-plan.md).
 
 ## Layering & separation of concerns
 
 StockPilot is one deployable Next.js app, but it is **not** one undifferentiated blob. Concerns are
 separated by _layer_, enforced by what each layer is allowed to import:
 
-| Layer              | Lives in                                   | Responsibility                                                                            | Must not                                    |
-| ------------------ | ------------------------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------- |
-| **Frontend (UI)**  | `app/**/page.tsx`, `components/`, `hooks/` | Render UI; call the REST API over HTTP.                                                   | Import Firestore or the Admin SDK directly. |
-| **Backend — HTTP** | `app/api/**/route.ts`                      | Thin controllers: authenticate, check role, Zod-validate, call a service.                 | Hold business/data logic inline.            |
-| **Backend — core** | `lib/`                                     | Data access (`ProductRepository`), auth, validation — framework-agnostic pure TypeScript. | Import React or anything HTTP-specific.     |
+| Layer              | Lives in                                   | Responsibility                                                                                                               | Must not                                    |
+| ------------------ | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **Frontend (UI)**  | `app/**/page.tsx`, `components/`, `hooks/` | Render UI; call the REST API over HTTP.                                                                                      | Import Firestore or the Admin SDK directly. |
+| **Backend — HTTP** | `app/api/**/route.ts`                      | Thin controllers: authenticate, check role, Zod-validate, call a service.                                                    | Hold business/data logic inline.            |
+| **Backend — core** | `lib/`                                     | Data access (`productRepository`, `categoryRepository`), search sync, auth, validation — framework-agnostic pure TypeScript. | Import React or anything HTTP-specific.     |
 
 Two consequences of this split:
 
@@ -127,13 +137,15 @@ extraction path above if independent scaling is ever needed. See
 The significant calls we made, each with a one-line summary and a pointer to the full reasoning.
 These are the calls most worth understanding before changing the system.
 
-| Trade-off                                  | What we chose and why                                                                                                                                           | Detail                                                                                                                              |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| **One app vs. split frontend/backend**     | A single Next.js app (UI + API). Simpler to run and explain; the data access layer stays separable if a split is ever needed.                                   | ADR [0002](decisions/0002-tech-stack-nextjs-firebase-firestore.md)                                                                  |
-| **REST vs. GraphQL**                       | REST via Route Handlers. GraphQL auto-gen targets SQL, not Firestore, and single-entity CRUD doesn't need it.                                                   | ADR [0003](decisions/0003-rest-over-graphql.md)                                                                                     |
-| **Session cookies vs. client-held tokens** | Admin-SDK-verified httpOnly session cookie. Resists XSS token theft and keeps the OWASP story clean; costs an extra token-exchange step and an admin seed path. | ADR [0004](decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md) · [design/authorization.md](design/authorization.md) |
-| **Scale now vs. deferred**                 | Build read-cheap shapes now (cursor pagination, aggregate counters); defer sharded counters and full multi-tenancy until a trigger demands them.                | ADR [0006](decisions/0006-scalability-posture.md) · [design/scalability.md](design/scalability.md)                                  |
-| **Thoughtful tests vs. 100% coverage**     | Unit-test the security-critical paths + deny branches; Playwright e2e for the integrated flows (incl. viewer-403); no blanket coverage mandate.                 | ADR [0009](decisions/0009-testing-strategy.md) · [core-beliefs.md](core-beliefs.md) #9                                              |
+| Trade-off                                  | What we chose and why                                                                                                                                                                                | Detail                                                                                                                              |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **One app vs. split frontend/backend**     | A single Next.js app (UI + API). Simpler to run and explain; the data access layer stays separable if a split is ever needed.                                                                        | ADR [0002](decisions/0002-tech-stack-nextjs-firebase-firestore.md)                                                                  |
+| **REST vs. GraphQL**                       | REST via Route Handlers. GraphQL auto-gen targets SQL, not Firestore, and single-entity CRUD doesn't need it.                                                                                        | ADR [0003](decisions/0003-rest-over-graphql.md)                                                                                     |
+| **Session cookies vs. client-held tokens** | Admin-SDK-verified httpOnly session cookie. Resists XSS token theft and keeps the OWASP story clean; costs an extra token-exchange step and an admin seed path.                                      | ADR [0004](decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md) · [design/authorization.md](design/authorization.md) |
+| **Scale now vs. deferred**                 | Build read-cheap shapes now (cursor pagination, aggregate counters); defer sharded counters and full multi-tenancy until a trigger demands them.                                                     | ADR [0006](decisions/0006-scalability-posture.md) · [design/scalability.md](design/scalability.md)                                  |
+| **Thoughtful tests vs. 100% coverage**     | Unit-test the security-critical paths + deny branches; Playwright e2e for the integrated flows (incl. viewer-403); no blanket coverage mandate.                                                      | ADR [0009](decisions/0009-testing-strategy.md) · [core-beliefs.md](core-beliefs.md) #9                                              |
+| **Full-text search: own engine vs. none**  | Firestore can't do substring search, so search runs on self-hosted **Meilisearch** (a derived index, best-effort synced, off by default) rather than a hosted service — keeps zero-config local dev. | ADR [0018](decisions/0018-full-text-search-with-meilisearch.md) · [design/scalability.md](design/scalability.md#search)             |
+| **Category as a collection vs. free text** | Promote `category` to its own collection with admin CRUD; products keep a denormalized name for cheap display (rename fans out, delete is blocked while in use).                                     | ADR [0016](decisions/0016-categories-as-a-collection.md)                                                                            |
 
 ## Docs organization
 

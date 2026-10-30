@@ -32,19 +32,23 @@ Re-theming = editing these values in one place.
 
 ## Component set
 
-- **Primitives** (`components/ui/`): Button, Input, Select, Dialog, Table, Card, Badge, Skeleton,
-  Toast. Accessible (Radix), themed via tokens, variants via CVA.
-- **Feature components** (`components/<feature>/`): `ProductTable`, `ProductForm`, `MetricCard`,
-  `FilterBar`, `Pagination`, and role-gated action buttons (admin sees edit/delete; viewer doesn't).
-- **Shared UX states**: `EmptyState`, `ErrorState`, loading skeletons, success/error toasts — one
-  implementation each, reused across views.
+- **Primitives** (`components/ui/`): Button, Input, Label, Card, Dialog, Badge — accessible (Radix
+  where applicable), themed via tokens, variants via CVA. The tables and the filter/sort/search
+  controls are native HTML elements styled with the same tokens.
+- **Feature components** (`components/<feature>/`): products — `ProductTable`, `ProductFormDialog`,
+  `DeleteDialog`, `MetricCards`, `FilterBar`, `Pagination`, `SearchBox`, `SearchResults`; categories —
+  `CategoryManager`, `CategoryTable`, `CategoryFormDialog`, `DeleteCategoryDialog`. Write controls are
+  role-gated (admin sees edit/delete + category management; viewer doesn't), enforced on the server.
+- **Loading / empty / error states**: rendered inline by the results components (`ProductResults`,
+  `SearchResults`, `CategoryManager`) with consistent i18n copy; no toast library yet.
 
 ## State management
 
 - **Server state**: TanStack Query owns fetching, caching, loading/error, and cache invalidation
   after mutations. No per-component fetch boilerplate.
-- **UI state** (active filter, sort key, pagination cursor): held locally in the dashboard, encoded
-  in the URL query where it should be shareable/back-button-friendly.
+- **UI state** (status/category filter, sort key, page cursor, search query): held locally in the
+  dashboard via React state (`usePagedProducts` / `usePagedSearch`); the search box is debounced.
+  URL-encoding for shareable/back-button-friendly views is a possible later refinement.
 - **RSC vs. client**: static shell and initial data lean on server components; interactive pieces
   (forms, filter controls, anything with hooks) are client components. The boundary is drawn as
   tightly as possible so most of the tree stays server-rendered.

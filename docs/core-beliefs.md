@@ -15,9 +15,10 @@ the access control. If the server check is missing, the feature is not done. See
 
 ## 2. The browser never talks to Firestore directly
 
-All database access goes through the server-side data access layer (`ProductRepository`). React
-components call our REST API; they never import the Firestore SDK for reads or writes. This keeps one
-place to enforce authorization, validation, and shaping.
+All database access goes through the server-side data access layer (the repositories in `lib/data/`,
+e.g. `productRepository`, `categoryRepository`). React components call our REST API; they never import
+the Firestore SDK for reads or writes. This keeps one place to enforce authorization, validation, and
+shaping.
 
 ## 3. Validate every input at the boundary
 
@@ -53,9 +54,9 @@ ESLint, Prettier, and the type-checker run on a pre-commit hook and in CI. Do no
 StockPilot is expected to handle multi-tenancy and 10× product growth. We don't over-build for scale we
 don't have, but every data-shape and query choice is made with those targets in mind, and the
 reasoning (and what we deferred) is written down — see [design/scalability.md](design/scalability.md).
-Concretely: cursor pagination over offsets, targeted composite indexes, and maintained aggregate
-counters instead of full-collection scans for metrics. Scale-_awareness_ is the rule; premature
-scale machinery is not.
+Concretely: cursor pagination over offsets, targeted composite indexes, and Firestore aggregation
+queries (not full-collection scans) for metrics — with maintained counters documented as the scale
+path. Scale-_awareness_ is the rule; premature scale machinery is not.
 
 ## 9. Test the parts that would actually break — happy path _and_ failure branches
 

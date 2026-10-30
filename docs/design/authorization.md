@@ -5,9 +5,10 @@
 
 ## Roles
 
-- **admin** — full access: create, read, update, delete products; see all edit/delete controls.
-- **viewer** — read-only: list and view products and metrics; no write controls, and the server
-  rejects writes.
+- **admin** — full access: create, read, update, delete products **and categories**; see all
+  edit/delete controls and the category-management screen.
+- **viewer** — read-only: list and view products, categories, and metrics; no write controls, and the
+  server rejects writes.
 
 A user's role is a **Firebase custom claim** (the enforcement source of truth) and is also mirrored
 into their `users/{uid}` document for easy listing.
@@ -23,7 +24,7 @@ into their `users/{uid}` document for easy listing.
 5. Browser stores the cookie (JS cannot read it) and sends it automatically on later requests
 ```
 
-Sign-out: `POST /api/auth/session/logout` clears the cookie.
+Sign-out: `DELETE /api/auth/session` clears the cookie.
 
 ## Every protected request
 
