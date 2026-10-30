@@ -29,6 +29,9 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,
+    // Surface build/emulator/seed output so CI failures are diagnosable.
+    stdout: 'pipe',
+    stderr: 'pipe',
     env: {
       NEXT_PUBLIC_USE_FIREBASE_EMULATOR: '1',
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'stockpilot-e2e',

@@ -63,7 +63,9 @@ async function seedSearchableProduct(ownerId) {
   });
   const doc = { ...SEARCHABLE, ownerId, createdAt: null, updatedAt: null, createdAtMs: Date.now() };
   const task = await meili.index('products').addDocuments([doc], { primaryKey: 'id' });
-  await meili.tasks.waitForTask(task.taskUid); // ensure it's searchable before tests run
+  // Generous timeout: a cold Meilisearch (CI) processes createIndex→settings→add in
+  // sequence, which can exceed the client's short default. Ensure it's searchable first.
+  await meili.tasks.waitForTask(task.taskUid, { timeout: 60_000 });
   console.log('e2e search index seeded');
 }
 
