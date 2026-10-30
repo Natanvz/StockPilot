@@ -4,6 +4,7 @@ import { requireRole, requireUser } from '@/lib/auth/guards';
 import { ROLE } from '@/lib/auth/roles';
 import { categoryRepository } from '@/lib/data/category-repository';
 import { DEFAULT_PAGE_SIZE, productRepository } from '@/lib/data/product-repository';
+import { indexProduct } from '@/lib/search/product-index';
 import { ALL_CATEGORIES, type SortKey, type StatusFilter } from '@/lib/types/product';
 import { createProductSchema } from '@/lib/validation/product';
 
@@ -60,6 +61,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       { ...parsed.data, category: category.name },
       user.uid,
     );
+    await indexProduct(product); // best-effort search sync (ADR 0018)
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
     return toErrorResponse(error);

@@ -37,7 +37,7 @@ function makeDb(
   opts: {
     listDocs?: FakeDoc[];
     getDoc?: FakeDoc;
-    categoryDocs?: { ref: unknown }[];
+    categoryDocs?: unknown[];
   } & StatOpts,
 ) {
   const get = vi.fn().mockResolvedValue(opts.getDoc);
@@ -64,13 +64,11 @@ function makeDb(
 
   // renameCategory(): where('categoryId','==',id).get() → docs/empty/size
   const categoryDocs = opts.categoryDocs ?? [];
-  const queryGet = vi
-    .fn()
-    .mockResolvedValue({
-      docs: categoryDocs,
-      empty: categoryDocs.length === 0,
-      size: categoryDocs.length,
-    });
+  const queryGet = vi.fn().mockResolvedValue({
+    docs: categoryDocs,
+    empty: categoryDocs.length === 0,
+    size: categoryDocs.length,
+  });
   const batchUpdate = vi.fn();
   const batchCommit = vi.fn().mockResolvedValue(undefined);
   const batch = vi.fn(() => ({ update: batchUpdate, commit: batchCommit }));
@@ -150,6 +148,16 @@ describe('productRepository.count', () => {
   it('returns the count aggregation total', async () => {
     mockGetAdminDb.mockReturnValue(makeDb({ total: 7 }).db);
     await expect(productRepository.count({ status: 'active' })).resolves.toBe(7);
+  });
+});
+
+describe('productRepository.listByCategory', () => {
+  it('maps every product in the category', async () => {
+    mockGetAdminDb.mockReturnValue(
+      makeDb({ categoryDocs: [fakeDoc('p1', docData), fakeDoc('p2', docData)] }).db,
+    );
+    const products = await productRepository.listByCategory('cat-1');
+    expect(products.map((p) => p.id)).toEqual(['p1', 'p2']);
   });
 });
 

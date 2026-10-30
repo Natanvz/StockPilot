@@ -4,6 +4,7 @@ import { requireRole, requireUser } from '@/lib/auth/guards';
 import { ROLE } from '@/lib/auth/roles';
 import { categoryRepository } from '@/lib/data/category-repository';
 import { productRepository } from '@/lib/data/product-repository';
+import { indexProducts } from '@/lib/search/product-index';
 import { updateCategorySchema } from '@/lib/validation/category';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -40,9 +41,11 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
     if (!category) {
       return notFound();
     }
-    // Fan out the new name to the denormalized copy on referencing products (ADR 0016).
+    // Fan out the new name to the denormalized copy on referencing products (ADR 0016),
+    // then reindex those products so search reflects the new name (best-effort, ADR 0018).
     if (parsed.data.name !== undefined) {
       await productRepository.renameCategory(id, category.name);
+      await indexProducts(await productRepository.listByCategory(id));
     }
     return NextResponse.json({ category });
   } catch (error) {

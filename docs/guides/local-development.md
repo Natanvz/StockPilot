@@ -58,6 +58,27 @@ starts the normal (persisting) emulators, so you begin empty and new data is sav
 `npm run seed:users` afterward if you want the demo accounts back. (You can also just delete the
 `./.firebase-data` folder by hand — it's gitignored.)
 
+## Full-text search (optional)
+
+Search is backed by **Meilisearch** ([ADR 0018](../decisions/0018-full-text-search-with-meilisearch.md))
+and is **off by default** — the app runs fully without it; the search box is simply hidden. To turn it
+on locally:
+
+```bash
+# 1. Start Meilisearch (needs Docker). Runs keyless in development mode.
+npm run search            # → http://127.0.0.1:7700
+
+# 2. Enable it for the app: add these to .env.local
+#    MEILI_HOST=http://127.0.0.1:7700
+#    NEXT_PUBLIC_SEARCH_ENABLED=1
+
+# 3. Build/refresh the index from the emulator's products
+npm run reindex:search
+```
+
+Firestore stays the source of truth; the index is derived and kept in sync on each product write
+(best-effort). Re-run `npm run reindex:search` any time to rebuild it.
+
 ## Testing
 
 - Unit: `npm run test` (Vitest).

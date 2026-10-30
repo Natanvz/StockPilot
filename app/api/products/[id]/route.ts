@@ -4,6 +4,7 @@ import { requireRole, requireUser } from '@/lib/auth/guards';
 import { ROLE } from '@/lib/auth/roles';
 import { categoryRepository } from '@/lib/data/category-repository';
 import { productRepository, type UpdateProductData } from '@/lib/data/product-repository';
+import { indexProduct, removeProduct } from '@/lib/search/product-index';
 import { updateProductSchema } from '@/lib/validation/product';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -46,7 +47,11 @@ export async function PATCH(request: Request, { params }: RouteContext): Promise
       data.category = category.name;
     }
     const product = await productRepository.update(id, data);
-    return product ? NextResponse.json({ product }) : notFound();
+    if (!product) {
+      return notFound();
+    }
+    await indexProduct(product); // best-effort search sync (ADR 0018)
+    return NextResponse.json({ product });
   } catch (error) {
     return toErrorResponse(error);
   }
@@ -58,7 +63,11 @@ export async function DELETE(_request: Request, { params }: RouteContext): Promi
     await requireRole(ROLE.ADMIN);
     const { id } = await params;
     const removed = await productRepository.remove(id);
-    return removed ? NextResponse.json({ ok: true }) : notFound();
+    if (!removed) {
+      return notFound();
+    }
+    await removeProduct(id); // best-effort search sync (ADR 0018)
+    return NextResponse.json({ ok: true });
   } catch (error) {
     return toErrorResponse(error);
   }

@@ -202,6 +202,15 @@ export const productRepository = {
     return true;
   },
 
+  /** All products in a category (unbounded) — used to reindex search after a rename. */
+  async listByCategory(categoryId: string): Promise<Product[]> {
+    const snapshot = await getAdminDb()
+      .collection(COLLECTION)
+      .where('categoryId', '==', categoryId)
+      .get();
+    return snapshot.docs.map((doc) => toProduct(doc.id, doc.data()));
+  },
+
   /** How many products reference a category — used to block its deletion (ADR 0016). */
   async countByCategory(categoryId: string): Promise<number> {
     const snapshot = await getAdminDb()
