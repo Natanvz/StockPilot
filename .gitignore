@@ -51,6 +51,9 @@ graphify-out/[0-9][0-9][0-9][0-9]-*/
 graphify-out/.graphify_python
 graphify-out/.graphify_root
 
+# Local submission notes — never commit (keep the repo framed as a real project)
+/CHALLENGE.md
+
 # OS / editor noise
 .DS_Store
 Thumbs.db

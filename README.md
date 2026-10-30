@@ -14,8 +14,9 @@ for the build plan and [docs/decisions/](docs/decisions/) for why each call was 
 
 - Email/password **authentication** (Firebase) with secure httpOnly session cookies and two roles.
 - **Product CRUD** with Zod-validated input and role-gated writes (admins write, viewers read).
-- A **dashboard**: product table with search, status filter, and sort; cursor-based "Load more"
-  pagination; summary metrics (total, active, active catalog value).
+- A **dashboard**: product table with status and category filters and sort; **server-side**
+  cursor-based pagination with a classic pager (Prev/Next, "Page X of Y", page-size); summary metrics
+  (total, active, active catalog value).
 - **Role-based UI** enforced on the server, never just hidden in the client.
 - Light/dark theming and i18n-ready copy throughout.
 
@@ -57,7 +58,7 @@ deploy, create a free one and fill `.env.local` from `.env.example` — see the
 | Area                | Summary                                                                                                                                                        | Detail                                                                                                                                             |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Architecture**    | One Next.js app: App Router pages + Route Handlers (the Node API), a Firestore data access layer, Firebase Auth.                                               | [docs/architecture.md](docs/architecture.md)                                                                                                       |
-| **Database schema** | `products` and `users` collections in Firestore; indexing and scale notes (multi-tenancy, 10× growth).                                                         | [docs/design/database-schema.md](docs/design/database-schema.md)                                                                                   |
+| **Database schema** | `products`, `categories`, and `users` collections in Firestore; indexing and scale notes (multi-tenancy, 10× growth).                                          | [docs/design/database-schema.md](docs/design/database-schema.md)                                                                                   |
 | **Security & auth** | Firebase ID token verified server-side via the Admin SDK, stored in an httpOnly session cookie; roles via custom claims; every write re-checked on the server. | [docs/design/authorization.md](docs/design/authorization.md) · ADR [0004](docs/decisions/0004-auth-session-cookies-admin-sdk-and-custom-claims.md) |
 | **Code quality**    | ESLint + Prettier + TypeScript strict, enforced by a pre-commit hook and GitHub Actions CI.                                                                    | [docs/guides/code-quality.md](docs/guides/code-quality.md) · ADR [0005](docs/decisions/0005-code-quality-enforcement.md)                           |
 | **Core beliefs**    | The non-negotiable rules this codebase holds to.                                                                                                               | [docs/core-beliefs.md](docs/core-beliefs.md)                                                                                                       |
@@ -84,13 +85,16 @@ ADR [0003](docs/decisions/0003-rest-over-graphql.md)).
 ## Scope
 
 **In scope** — the four core areas (auth & authorization, product CRUD, dashboard, database design)
-plus three additional features: **role-based UI**, **search & cursor pagination**, and **CI/CD**.
-Each in-scope decision is an **Accepted** record in [docs/decisions/](docs/decisions/).
+plus extra features: **role-based UI**, **server-side filtering + cursor pagination**, a
+**categories collection with admin CRUD**, and **CI**. Each in-scope decision is an **Accepted**
+record in [docs/decisions/](docs/decisions/).
 
-**Out of scope (for now)** — features we deliberately did not build in the first version: an
-**AI-powered feature** (ADR [0007](docs/decisions/0007-ai-powered-feature.md)) and **observability**
-(ADR [0008](docs/decisions/0008-observability.md)). These are recorded as **Proposed** decisions —
-designed and ready to pick up, not yet implemented — and are the first items in "what's next."
+**Out of scope (for now)** — an **AI-powered feature**
+(ADR [0007](docs/decisions/0007-ai-powered-feature.md)) and **observability**
+(ADR [0008](docs/decisions/0008-observability.md)), both recorded as **Proposed** decisions (designed,
+not yet built), and **deployment / CD** (ADR [0017](docs/decisions/0017-deploy-to-vercel.md),
+**Rejected** — the app runs locally on the Firebase emulator). The two Proposed items are the first in
+"what's next."
 
 ## What's next
 
@@ -100,7 +104,8 @@ With another week, in rough priority order:
    product descriptions, with the safe-productionization story already written.
 2. **Observability** (ADR [0008](docs/decisions/0008-observability.md)) — structured logging +
    error tracking.
-3. **Server-side search** via a search index, replacing client-side search over loaded pages.
+3. **Server-side full-text search** via a search index (today the list filters by status and
+   category, not free text — Firestore has no native substring search).
 4. **Maintained aggregate counters** for metrics at write-scale (ADR [0006](docs/decisions/0006-scalability-posture.md)).
 5. A real **multi-tenancy** pass (subcollection-per-tenant).
 
