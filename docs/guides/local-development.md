@@ -61,18 +61,34 @@ starts the normal (persisting) emulators, so you begin empty and new data is sav
 ## Full-text search (optional)
 
 Search is backed by **Meilisearch** ([ADR 0018](../decisions/0018-full-text-search-with-meilisearch.md))
-and is **off by default** — the app runs fully without it; the search box is simply hidden. To turn it
-on locally:
+and is **off by default** — the app runs fully without it; the search box is simply hidden. **Docker is
+not required**: Meilisearch is a single self-contained binary. Turn search on in three steps.
+
+**1. Start Meilisearch** — pick whichever you have. It listens on `http://127.0.0.1:7700` and runs
+keyless in development mode.
 
 ```bash
-# 1. Start Meilisearch (needs Docker). Runs keyless in development mode.
-npm run search            # → http://127.0.0.1:7700
+# Package manager (no Docker):
+brew install meilisearch && meilisearch                 # macOS
+winget install Meilisearch.Meilisearch && meilisearch   # Windows (or: scoop install meilisearch)
+curl -L https://install.meilisearch.com | sh && ./meilisearch   # Linux / macOS script
 
-# 2. Enable it for the app: add these to .env.local
-#    MEILI_HOST=http://127.0.0.1:7700
-#    NEXT_PUBLIC_SEARCH_ENABLED=1
+# Or the binary: download meilisearch-<os> from github.com/meilisearch/meilisearch/releases, then run it.
 
-# 3. Build/refresh the index from the emulator's products
+# Or, if you prefer Docker (convenience):
+npm run search
+```
+
+**2. Enable it for the app** — add these to `.env.local`:
+
+```bash
+MEILI_HOST=http://127.0.0.1:7700
+NEXT_PUBLIC_SEARCH_ENABLED=1
+```
+
+**3. Build the index** from the emulator's products:
+
+```bash
 npm run reindex:search
 ```
 

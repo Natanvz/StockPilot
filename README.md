@@ -53,6 +53,11 @@ Firebase project to run locally. To
 deploy, create a free one and fill `.env.local` from `.env.example` — see the
 [deployment guide](docs/guides/deployment.md).
 
+> **Optional — full-text search.** StockPilot can use [Meilisearch](https://www.meilisearch.com/) for
+> search. It's **off by default and not required to run the app** — and needs **no Docker** (it's a
+> single binary; Docker is just one way to start it). To try it, see
+> [local-development.md → Full-text search](docs/guides/local-development.md#full-text-search-optional).
+
 ## What's inside
 
 | Area                | Summary                                                                                                                                                        | Detail                                                                                                                                             |
